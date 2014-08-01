@@ -1,0 +1,234 @@
+<?php
+
+/*
+ * (c) Alexander Zhukov <zbox82@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Zbox\UnifiedPush;
+
+use Zbox\UnifiedPush\Message\MessageInterface,
+    Zbox\UnifiedPush\Message\NotificationBuilder;
+use Zbox\UnifiedPush\NotificationService\NotificationServices,
+    Zbox\UnifiedPush\NotificationService\ServiceClientInterface,
+    Zbox\UnifiedPush\NotificationService\ServiceClientFactory;
+use Zbox\UnifiedPush\Exception\DispatchMessageException,
+    Zbox\UnifiedPush\Exception\MalformedNotificationException,
+    Zbox\UnifiedPush\Exception\ClientException,
+    Zbox\UnifiedPush\Exception\RuntimeException;
+use Psr\Log\LoggerAwareInterface,
+    Psr\Log\LoggerInterface,
+    Psr\Log\NullLogger;
+
+/**
+ * Class Dispatcher
+ * @package Zbox\UnifiedPush
+ */
+class Dispatcher implements LoggerAwareInterface
+{
+    /**
+     * @var Application
+     */
+    private $application;
+
+    /**
+     * @var array
+     */
+    private $connectionPool;
+
+    /**
+     * @var ServiceClientFactory
+     */
+    private $clientFactory;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param Application $application
+     */
+    public function __construct(Application $application)
+    {
+        $this->setLogger(new NullLogger());
+        $this->application    = $application;
+        $this->clientFactory  = new ServiceClientFactory();
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @return $this
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @param bool $isDevelopment
+     * @return $this
+     */
+    public function setDevelopmentMode($isDevelopment)
+    {
+        $this->clientFactory->setDevelopmentMode($isDevelopment);
+        return $this;
+    }
+
+    /**
+     * @param string $serviceName
+     * @return array
+     */
+    private function getServiceCredentials($serviceName)
+    {
+        return $this->application->getCredentialsByService($serviceName);
+    }
+
+    /**
+     * @param string $serviceName
+     * @return ServiceClientInterface
+     */
+    public function getConnection($serviceName)
+    {
+        if (!empty($this->connectionPool[$serviceName])) {
+            $this->initConnection($serviceName);
+        }
+
+        return $this->connectionPool[$serviceName];
+    }
+
+    /**
+     * @param string $serviceName
+     * @return $this
+     */
+    public function initConnection($serviceName)
+    {
+        $credentials  = $this->getServiceCredentials($serviceName);
+        $connection   = $this->clientFactory->createServiceClient($serviceName, $credentials);
+        $this->connectionPool[$serviceName] = $connection;
+
+        return $this;
+    }
+
+    /**
+     * @param ServiceClientInterface $connection
+     * @return $this
+     */
+    public function addConnection(ServiceClientInterface $connection)
+    {
+        $this->connectionPool = $connection;
+        return $this;
+    }
+
+    /**
+     * @param string $serviceName
+     * @return ServiceClientInterface
+     */
+    private function createFeedbackConnection($serviceName)
+    {
+        $credentials  = $this->getServiceCredentials($serviceName);
+        return $this->clientFactory->createServiceClient($serviceName, $credentials, true);
+    }
+
+    /**
+     * @param MessageInterface $message
+     * @return bool
+     */
+    private function sendMessage(MessageInterface $message)
+    {
+        $this->logger->info(
+            sprintf("Sending message id '%s'", $message->getMessageIdentifier())
+        );
+        $builder = new NotificationBuilder($message);
+
+        while ($notification = $builder->getNotification()) {
+            try {
+                $connection = $this->getConnection($message->getMessageType());
+                $connection->sendNotification($notification);
+
+            } catch (DispatchMessageException $e) {
+                $this->logger->warning(
+                    sprintf("Dispatch message warning with code %d  '%s'", $e->getCode(), $e->getMessage())
+                );
+
+            } catch (MalformedNotificationException $e) {
+                $this->logger->error(
+                    sprintf("Malformed Notification error: %s", $e->getMessage())
+                );
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function sendQueue()
+    {
+        $messages = $this->application->getMessages();
+
+        try {
+            while ($messages->valid()) {
+                $message = $messages->current();
+                if ($this->sendMessage($message)) {
+                    $this->application->unsetMessage($message);
+                }
+                $messages->next();
+            }
+        } catch (ClientException $e) {
+            $this->logger->error(
+                sprintf("Client connection error: %s", $e->getMessage())
+            );
+            return;
+
+        } catch (RuntimeException $e) {
+            $this->logger->error(
+                sprintf("Runtime error: %s", $e->getMessage())
+            );
+            return;
+
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf("Error occurs: %s", $e->getMessage())
+            );
+            return;
+        }
+    }
+
+    /**
+     * @return $this
+     */
+    public function loadFeedback()
+    {
+        $serviceName = NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE;
+
+        try {
+            $this->logger->info(sprintf("Querying the feedback service '%s'"), $serviceName);
+
+            $connection = $this->createFeedbackConnection($serviceName);
+            $refusedRecipients = $connection->readFeedback();
+
+            while ($refusedRecipients->valid()) {
+                $recipient = $refusedRecipients->current();
+                $this->application->addRefusedRecipient($serviceName, $recipient);
+                $refusedRecipients->next();
+            }
+
+        } catch (RuntimeException $e) {
+            $this->logger->error(
+                sprintf("Runtime error while acquiring feedback: %s", $e->getMessage())
+            );
+
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf("Error occurs while acquiring feedback: %s", $e->getMessage())
+            );
+        }
+
+        return $this;
+    }
+}

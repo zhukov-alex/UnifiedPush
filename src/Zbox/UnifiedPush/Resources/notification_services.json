@@ -1,0 +1,32 @@
+{
+    "APNS": {
+        "push": {
+            "production": {
+                "host": "gateway.push.apple.com",
+                "port": 2195
+            },
+            "development": {
+                "host": "gateway.sandbox.push.apple.com",
+                "port": 2195
+            }
+        },
+        "feedback": {
+            "production": {
+                "host": "feedback.push.apple.com",
+                "port": 2196
+            },
+            "development": {
+                "host": "feedback.sandbox.push.apple.com",
+                "port": 2196
+            }
+        }
+    },
+    "GCM": {
+        "push": {
+            "production": {
+                "host": "android.googleapis.com/gcm/send",
+                "port": 443
+            }
+        }
+    }
+}

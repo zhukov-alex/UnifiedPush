@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+        bootstrap="./tests/bootstrap.php"
+        processIsolation="false"
+        verbose="true"
+        strict="false"
+        colors="true">
+    <testsuites>
+        <testsuite name="UnifiedPush Test Suite">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

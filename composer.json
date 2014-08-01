@@ -1,0 +1,26 @@
+{
+    "name": "UnifiedPush",
+    "description": "Unified Push supports push notifications for iOS and Android devices via APNs and GCM",
+    "type": "library",
+    "keywords": ["apns", "apn", "gcm", "push", "notification", "message", "apple", "android", "iphone"],
+    "homepage": "https://github.com/zbox/UnifiedPush",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Zhukov",
+            "email": "zbox82@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "kriswallsmith/buzz": "*"
+    },
+    "suggest": {
+        "monolog/monolog": "Allows more advanced logging of the application flow"
+    },
+    "autoload": {
+        "psr-0": {
+            "Zbox\\UnifiedPush": "src/"
+        }
+    }
+}
