@@ -49,6 +49,8 @@ class Application
     }
 
     /**
+     * Returns path to application-based notification services credentials
+     *
      * @return string
      */
     public function getCredentialsFilepath()
@@ -67,6 +69,8 @@ class Application
     }
 
     /**
+     * Gets an iterator from an ArrayObject instance
+     *
      * @return \ArrayIterator
      */
     public function getMessages()
@@ -75,6 +79,8 @@ class Application
     }
 
     /**
+     * Adds a message to collection
+     *
      * @param MessageInterface $message
      * @return $this
      */
@@ -86,6 +92,8 @@ class Application
     }
 
     /**
+     * Removes the given message from collection
+     *
      * @param MessageInterface $message
      * @return $this
      */
@@ -105,6 +113,8 @@ class Application
     }
 
     /**
+     * Adds a refused recipient to collection
+     *
      * @param string $serviceName
      * @param RecipientDevice $recipient
      * @return $this
@@ -123,6 +133,8 @@ class Application
     }
 
     /**
+     * Returns the list of names of notification services available for the application
+     *
      * @return array
      */
     public function getInitializedServices()
@@ -131,6 +143,8 @@ class Application
     }
 
     /**
+     * Returns credentials for notification service
+     *
      * @param string $serviceName
      * @throws DomainException
      * @return string
@@ -146,6 +160,8 @@ class Application
     }
 
     /**
+     * Load sender`s notification services credentials by application name
+     *
      * @param string $applicationName
      * @return $this
      * @throws DomainException

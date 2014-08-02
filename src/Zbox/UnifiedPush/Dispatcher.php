@@ -79,6 +79,8 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Returns credentials for notification service
+     *
      * @param string $serviceName
      * @return array
      */
@@ -88,6 +90,8 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Gets a service client connection by service name
+     *
      * @param string $serviceName
      * @return ServiceClientInterface
      */
@@ -101,6 +105,8 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Initialize service client connection by service name
+     *
      * @param string $serviceName
      * @return $this
      */
@@ -114,6 +120,8 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Adds a new service client connection
+     *
      * @param ServiceClientInterface $connection
      * @return $this
      */
@@ -124,6 +132,8 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Creates a feedback service connection
+     *
      * @param string $serviceName
      * @return ServiceClientInterface
      */
@@ -134,8 +144,12 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Tries to connect and send a message to notification service
+     *
      * @param MessageInterface $message
      * @return bool
+     * @throws DispatchMessageException
+     * @throws MalformedNotificationException
      */
     private function sendMessage(MessageInterface $message)
     {
@@ -165,7 +179,12 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Tries to deliver all enqueue messages to notification service
+     *
      * @return bool
+     * @throws ClientException
+     * @throws RuntimeException
+     * @throws \Exception
      */
     public function sendQueue()
     {
@@ -200,7 +219,11 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
+     * Tries to connect and load feedback data
+     *
      * @return $this
+     * @throws RuntimeException
+     * @throws \Exception
      */
     public function loadFeedback()
     {

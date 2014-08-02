@@ -15,6 +15,10 @@ namespace Zbox\UnifiedPush\Utils;
  */
 class JsonEncoder
 {
+    /**
+     * @param string $data
+     * @return string
+     */
     public static function jsonEncode($data)
     {
         if (version_compare(PHP_VERSION, '5.4', '>=' && defined('JSON_UNESCAPED_UNICODE'))) {

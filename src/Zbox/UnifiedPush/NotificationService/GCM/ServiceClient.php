@@ -37,9 +37,9 @@ class ServiceClient extends ServiceClientBase
     }
 
     /**
-     * If you send a notification that is accepted by APNs,
-     * nothing is returned. If you send a notification that is malformed
-     * or otherwise unintelligible, APNs returns an error-response packet
+     * When the message is processed successfully, the HTTP response has a 200 status.
+     * Body contains more information about the status of the message. When the request is rejected,
+     * the HTTP response contains a non-200 status code.
      *
      * @param string $notification
      * @throws ClientException
@@ -68,6 +68,8 @@ class ServiceClient extends ServiceClientBase
     }
 
     /**
+     * No feedback service available in GCM
+     *
      * @throws BadMethodCallException
      */
     public function readFeedback()

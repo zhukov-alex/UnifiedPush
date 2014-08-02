@@ -50,7 +50,6 @@ abstract class MessageBase implements MessageInterface
     protected $recipientCollection;
 
     /**
-     * Constructor
      * @param array $data
      */
     public final function __construct(array $data = array())
@@ -71,9 +70,18 @@ abstract class MessageBase implements MessageInterface
         return $this;
     }
 
+    /**
+     * Checks if recipient`s token is valid
+     *
+     * @param string $token
+     * @return bool
+     * @throws InvalidArgumentException
+     */
     abstract public function validateRecipient($token);
 
     /**
+     * Gets number of recipients allowed for single notification
+     *
      * @return int
      */
     public function getMaxRecipientsPerMessage()
@@ -82,6 +90,8 @@ abstract class MessageBase implements MessageInterface
     }
 
     /**
+     * Gets maximum size allowed for notification payload
+     *
      * @return int
      */
     public function getPayloadMaxLength()
@@ -165,6 +175,7 @@ abstract class MessageBase implements MessageInterface
 
     /**
      * @param string $messageIdentifier
+     * @throws InvalidArgumentException
      */
     public function setMessageIdentifier($messageIdentifier)
     {
@@ -178,6 +189,7 @@ abstract class MessageBase implements MessageInterface
      * Bad method call exception
      *
      * @param string $name
+     * @throws BadMethodCallException
      */
     protected function badMethodCallException($name)
     {

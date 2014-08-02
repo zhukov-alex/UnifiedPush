@@ -21,9 +21,11 @@ class NotificationServices
     const GOOGLE_CLOUD_MESSAGING               = 'GCM';
 
     /**
+     * Checks if notification service is supported
+     *
      * @param string $serviceName
      * @return string
-     * @throws \Zbox\UnifiedPush\Exception\DomainException
+     * @throws DomainException
      */
     public static function validateServiceName($serviceName)
     {

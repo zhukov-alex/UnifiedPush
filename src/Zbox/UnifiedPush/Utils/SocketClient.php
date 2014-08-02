@@ -61,8 +61,8 @@ class SocketClient
     private $streamResource;
 
     /**
-     * @param $transport
-     * @param $target
+     * @param string $transport
+     * @param string $target
      * @param int $targetPort
      * @param int $addressType
      */
@@ -78,6 +78,8 @@ class SocketClient
     }
 
     /**
+     * Returns address to the socket to connect to
+     *
      * @return string
      */
     public function getAddress()
@@ -92,6 +94,8 @@ class SocketClient
     }
 
     /**
+     * Gets address type
+     *
      * @return int
      */
     public function getAddressType()
@@ -100,6 +104,8 @@ class SocketClient
     }
 
     /**
+     * Sets address type
+     *
      * @param int $addressType
      * @return $this
      */
@@ -120,6 +126,8 @@ class SocketClient
     }
 
     /**
+     * Gets socket transport
+     *
      * @return string
      */
     public function getTransport()
@@ -128,6 +136,8 @@ class SocketClient
     }
 
     /**
+     * Defines socket transport
+     *
      * @param string $transport
      * @return $this
      */
@@ -142,6 +152,8 @@ class SocketClient
     }
 
     /**
+     * Gets target
+     *
      * @return string
      */
     public function getTarget()
@@ -150,6 +162,8 @@ class SocketClient
     }
 
     /**
+     * Sets target portion of the remote socket parameter
+     *
      * @param string $target
      * @return $this
      */
@@ -160,6 +174,8 @@ class SocketClient
     }
 
     /**
+     * Gets target port
+     *
      * @return int
      */
     public function getTargetPort()
@@ -168,6 +184,8 @@ class SocketClient
     }
 
     /**
+     * Sets target port
+     *
      * @param int $targetPort
      * @return $this
      */
@@ -185,6 +203,8 @@ class SocketClient
     }
 
     /**
+     * Sets stream context parameters
+     *
      * @param array $contextOptions
      * @return $this
      */
@@ -195,6 +215,8 @@ class SocketClient
     }
 
     /**
+     * Gets stream context parameters
+     *
      * @return array
      */
     public function getContextOptions()
@@ -203,6 +225,8 @@ class SocketClient
     }
 
     /**
+     * Gets blocking mode
+     *
      * @return boolean
      */
     public function isBlockingMode()
@@ -211,6 +235,8 @@ class SocketClient
     }
 
     /**
+     * Sets blocking/non-blocking mode on a stream
+     *
      * @param boolean $blockingMode
      * @return $this
      */
@@ -222,6 +248,8 @@ class SocketClient
     }
 
     /**
+     * Gets a socket timeout
+     *
      * @return int
      */
     public function getSocketTimeout()
@@ -234,6 +262,8 @@ class SocketClient
     }
 
     /**
+     * Sets a timeout for reading/writing data over the socket
+     *
      * @param int $socketTimeout
      * @return $this
      */
@@ -248,6 +278,7 @@ class SocketClient
     }
 
     /**
+     * Gets combination of connection flags
      * @return array
      */
     public function getConnectionFlags()
@@ -260,6 +291,8 @@ class SocketClient
     }
 
     /**
+     * Adds a connection flag
+     *
      * @param int $connectionFlag
      * @return $this
      */
@@ -281,6 +314,8 @@ class SocketClient
     }
 
     /**
+     * Drops all connection flags
+     *
      * @return $this
      */
     public function dropConnectionFlags()
@@ -290,6 +325,8 @@ class SocketClient
     }
 
     /**
+     * Returns a stream resource
+     *
      * @return resource
      */
     public function getStreamResource()
@@ -298,6 +335,8 @@ class SocketClient
     }
 
     /**
+     * Sets a stream resource
+     *
      * @param resource $streamResource
      * @return $this
      */
@@ -312,6 +351,8 @@ class SocketClient
     }
 
     /**
+     * Checks if stream resource exists
+     *
      * @return bool
      */
     public function isAlive()
@@ -320,6 +361,8 @@ class SocketClient
     }
 
     /**
+     * Establishes a socket connection
+     *
      * @return $this
      */
     public function connect()
@@ -353,6 +396,8 @@ class SocketClient
     }
 
     /**
+     * Writes data
+     *
      * @param string $data
      * @return $this
      */
@@ -373,6 +418,8 @@ class SocketClient
     }
 
     /**
+     * Reads data
+     *
      * @param int $length
      * @return string
      */
@@ -400,6 +447,8 @@ class SocketClient
     }
 
     /**
+     * Shutdowns a connection
+     *
      * @return $this
      */
     public function disconnect()

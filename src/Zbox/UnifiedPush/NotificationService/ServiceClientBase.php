@@ -48,7 +48,7 @@ abstract class ServiceClientBase implements ServiceClientInterface
 
     /**
      * @param array $serviceURL
-     * @return array
+     * @return $this
      */
     public function setServiceURL($serviceURL)
     {

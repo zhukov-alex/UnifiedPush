@@ -24,16 +24,22 @@ class ServiceClientFactory
     const FEEDBACK_SERVICE         = 'feedback';
 
     /**
+     * Type of environment
+     *
      * @var string
      */
     private $environment;
 
     /**
+     * Notification services connection config
+     *
      * @var array
      */
     private $config;
 
-
+    /**
+     * @return $this
+     */
     public function __construct()
     {
         $this->setEnvironment(self::ENVIRONMENT_PRODUCTION);
@@ -72,6 +78,8 @@ class ServiceClientFactory
     }
 
     /**
+     * Gets notification service url by service name
+     *
      * @param string $serviceName
      * @param bool $isFeedback
      * @return array
@@ -90,6 +98,8 @@ class ServiceClientFactory
     }
 
     /**
+     * Creates client server connection by service name and sender credentials
+     *
      * @param string $serviceName
      * @param array $credentials
      * @param bool $isFeedback
@@ -109,6 +119,8 @@ class ServiceClientFactory
     }
 
     /**
+     * Load notification services connection data
+     *
      * @return $this
      */
     protected function loadServicesConfig()

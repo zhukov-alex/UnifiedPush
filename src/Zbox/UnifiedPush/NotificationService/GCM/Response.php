@@ -37,10 +37,12 @@ class Response
     }
 
     /**
+     * Checks if response has succeed code or request was rejected
+     *
      * @param int $responseCode
-     * @throws \Zbox\UnifiedPush\Exception\MalformedNotificationException
-     * @throws \Zbox\UnifiedPush\Exception\DispatchMessageException
-     * @throws \Zbox\UnifiedPush\Exception\RuntimeException
+     * @throws MalformedNotificationException
+     * @throws DispatchMessageException
+     * @throws RuntimeException
      */
     private function checkResponseCode($responseCode)
     {
@@ -69,6 +71,8 @@ class Response
     }
 
     /**
+     * Parse response message
+     *
      * @param \stdClass $message
      */
     private function parseResponseMessage($message)

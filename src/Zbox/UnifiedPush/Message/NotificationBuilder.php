@@ -54,6 +54,9 @@ class NotificationBuilder
     }
 
     /**
+     * Generates number of notifications by message recipient count
+     * and notification service limititations
+     *
      * @return $this
      */
     public function buildNotifications()

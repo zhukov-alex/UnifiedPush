@@ -43,6 +43,8 @@ class ServiceClient extends ServiceClientBase
     }
 
     /**
+     * Gets socket connection (reestablish, if needed)
+     *
      * @return SocketClient
      */
     public function getClientConnection()

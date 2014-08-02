@@ -66,11 +66,15 @@ class APNSMessage extends MessageBase
     private $contentAvailable;
 
     /**
+     * Custom properties
+     *
      * @var array
      */
     private $customPayloadData = array();
 
     /**
+     * Gets message type
+     *
      * @return string
      */
     public function getMessageType()
@@ -226,7 +230,6 @@ class APNSMessage extends MessageBase
      * @param string $message
      * @param array $recipientsIds
      * @return string
-     * @throws \Zbox\UnifiedPush\Exception\MalformedNotificationException
      */
     public function packMessage($message, $recipientsIds)
     {
@@ -245,8 +248,7 @@ class APNSMessage extends MessageBase
     }
 
     /**
-     * @param string $token
-     * @return bool
+     * {@inheritdoc}
      */
     public function validateRecipient($token)
     {

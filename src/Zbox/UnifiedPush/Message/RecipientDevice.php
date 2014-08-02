@@ -18,6 +18,8 @@ use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 class RecipientDevice
 {
     /**
+     * Recipient device identifier
+     *
      * @var string
      */
     private $identifier;
@@ -43,6 +45,7 @@ class RecipientDevice
      * @param string $identifier
      * @param MessageInterface $message
      * @return $this
+     * @throws InvalidArgumentException
      */
     public function setIdentifier($identifier, MessageInterface $message)
     {

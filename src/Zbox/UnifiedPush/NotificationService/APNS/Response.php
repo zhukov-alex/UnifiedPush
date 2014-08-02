@@ -66,6 +66,8 @@ class Response
     }
 
     /**
+     * Unpacks response data
+     *
      * @param string $binaryData
      */
     public function parseResponse($binaryData)
@@ -81,6 +83,8 @@ class Response
     }
 
     /**
+     * Validates response data
+     *
      * @param string $responseData
      * @return $this
      */

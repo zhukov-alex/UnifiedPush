@@ -195,8 +195,7 @@ class GCMMessage extends MessageBase
     }
 
     /**
-     * @param string $token
-     * @return bool
+     * {@inheritdoc}
      */
     public function validateRecipient($token)
     {

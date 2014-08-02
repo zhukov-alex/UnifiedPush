@@ -17,6 +17,10 @@ class DateTimeHelper
 {
     const TIMEZONE_UTC = 'UTC';
 
+    /**
+     * @param \DateTime $dateTime
+     * @return \DateTime
+     */
     public static function updateTimezoneToUniversal(\DateTime $dateTime)
     {
         if ($dateTime->getTimezone()->getName() != self::TIMEZONE_UTC) {
