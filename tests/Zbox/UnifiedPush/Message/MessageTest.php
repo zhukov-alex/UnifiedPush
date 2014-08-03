@@ -56,9 +56,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             )),
             'TestMPNSMessage' => array(
                 self::MPNS_MESSAGE,
-                array(
-                    'userDefinedRaw'   => 'value'
-            ))
+                self::exampleMPNSMessage()
+            )
         );
     }
 
@@ -140,6 +139,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                 return $this->createGCMMessage();
                 break;
 
+            case self::MPNS_MESSAGE:
+                return $this->createMPNSMessage();
+                break;
+
             default:
                 throw new DomainException(sprintf("Unsupported message type '%'", $messageType));
                 break;
@@ -178,6 +181,37 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             ->setPayloadData(array('key' => 'val'))
             ->setExpirationTime(new \DateTime('+10 seconds'))
         ;
+        return $message;
+    }
+
+    /**
+     * @return MPNSRawMessage
+     */
+    public function createMPNSMessage()
+    {
+        $message = new MPNSRawMessage(array(
+            'userDefinedRaw' => 'value'
+        ));
+
+        return $message;
+    }
+
+    /**
+     * Example MPNS raw message
+     * @return \DOMDocument
+     */
+    public static function exampleMPNSMessage()
+    {
+        $message      = new \DOMDocument("1.0", "utf-8");
+        $baseElement  = $message->createElement("wp:Notification");
+        $baseElement->setAttribute("xmlns:wp", "WPNotification");
+        $message->appendChild($element);
+
+        $rootElement = $message->createElement("root");
+        $baseElement->appendChild($rootElement);
+        $element = $message->createElement("userDefinedRaw", "value");
+        $rootElement->appendChild($element);
+
         return $message;
     }
 }
