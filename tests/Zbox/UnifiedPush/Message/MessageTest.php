@@ -9,6 +9,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 {
     const APNS_MESSAGE = 'APNS';
     const GCM_MESSAGE  = 'GCM';
+    const MPNS_MESSAGE = 'MPNS';
 
     /**
      * @dataProvider createMessageProvider
@@ -49,6 +50,11 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                     'registration_ids' => array('device1', 'device2'),
                     'data'             => array('key' => 'val'),
                     'time_to_live'     => 10
+            )),
+            'TestMPNSMessage' => array(
+                self::MPNS_MESSAGE,
+                array(
+                    'userDefinedRaw'   => 'value'
             ))
         );
     }
@@ -100,6 +106,16 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             ),
             'Invalid GCM token'   => array(
                 self::GCM_MESSAGE,
+                'VWX4efa148*',
+                false
+            ),
+            'Valid MPNS token'     => array(
+                self::MPNS_MESSAGE,
+                'ZGV2aWNlIGlkZW50aWZpZXI=',
+                true
+            ),
+            'Invalid MPNS token'   => array(
+                self::MPNS_MESSAGE,
                 'VWX4efa148*',
                 false
             )

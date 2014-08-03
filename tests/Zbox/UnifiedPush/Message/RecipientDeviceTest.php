@@ -2,6 +2,8 @@
 
 namespace Zbox\UnifiedPush\Message;
 
+use Zbox\UnifiedPush\Message\Type\MPNSRaw as MPNSRawMessage;
+
 class RecipientDeviceTest extends \PHPUnit_Framework_TestCase
 {
     const VALID_GCM_IDENTIFIER = 'VWX4efa148e';
@@ -35,7 +37,8 @@ class RecipientDeviceTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'GCM message' => array(new GCMMessage(), true),
-            'APNS message' => array(new APNSMessage(), false)
+            'APNS message' => array(new APNSMessage(), false),
+            'MPNS message' => array(new MPNSRawMessage(), false)
         );
     }
 }

@@ -52,11 +52,9 @@ abstract class MessageBase implements MessageInterface
     /**
      * @param array $data
      */
-    public final function __construct(array $data = array())
+    public function __construct(array $data = array())
     {
         $this->setMessageIdentifier(uniqid());
-        $this->setExpirationTime(new \DateTime(self::DEFAULT_EXPIRATION_TIME_MODIFIER));
-
         $this->recipientCollection = new \ArrayIterator();
 
         foreach ($data as $key => $value) {
@@ -154,15 +152,20 @@ abstract class MessageBase implements MessageInterface
      */
     public function getExpirationTime()
     {
+        if (!$this->expirationTime) {
+            $this->setExpirationTime(new \DateTime(self::DEFAULT_EXPIRATION_TIME_MODIFIER));
+        }
         return $this->expirationTime;
     }
 
     /**
      * @param \DateTime $expirationTime
+     * @return $this
      */
     public function setExpirationTime(\DateTime $expirationTime)
     {
         $this->expirationTime = DateTimeHelper::updateTimezoneToUniversal($expirationTime);
+        return $this;
     }
 
     /**

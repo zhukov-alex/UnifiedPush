@@ -78,17 +78,20 @@ class NotificationBuilder
      * Returns validated and encoded message
      *
      * @param array $recipientIds
-     * @return string a binary string containing data
+     * @return array
      */
     private function buildNotification($recipientIds)
     {
         $message         = $this->message;
         $messageData     = $message->createMessage($recipientIds);
-        $encodedMessage  = JsonEncoder::jsonEncode($messageData);
 
-        $this->validatePayload($encodedMessage);
+        if (is_string($messageData)) {
+            $messageData = JsonEncoder::jsonEncode($messageData);
+        }
 
-        $notification = $message->packMessage($encodedMessage, $recipientIds);
+        $this->validatePayload($messageData);
+
+        $notification = $message->packMessage($messageData, $recipientIds);
 
         return $notification;
     }

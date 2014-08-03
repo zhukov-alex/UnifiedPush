@@ -4,6 +4,7 @@ namespace Zbox\UnifiedPush\NotificationService;
 
 use Zbox\UnifiedPush\NotificationService\APNS\Credentials as APNSCredentials;
 use Zbox\UnifiedPush\NotificationService\GCM\Credentials as GCMCredentials;
+use Zbox\UnifiedPush\NotificationService\MPNS\Credentials as MPNSCredentials;
 use Zbox\UnifiedPush\Exception\DomainException;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
@@ -11,6 +12,7 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
 {
     const APNS_CREDENTIALS = 'APNS';
     const GCM_CREDENTIALS  = 'GCM';
+    const MPNS_CREDENTIALS = 'MPNS';
 
     /**
      * @dataProvider credentialsProvider
@@ -44,9 +46,21 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
                         'certificatePassPhrase' => 'certificatePassPhrase'
                     ),
                     false
-                ),
+            ),
             'Valid GCM Test' => array(
                 self::GCM_CREDENTIALS,
+                array(
+                    'authToken' => 'testToken'
+                ),
+                true
+            ),
+            'Valid MPNS Test' => array(
+                self::MPNS_CREDENTIALS,
+                array(),
+                true
+            ),
+            'Inalid MPNS Test' => array(
+                self::MPNS_CREDENTIALS,
                 array(
                     'authToken' => 'testToken'
                 ),
@@ -69,6 +83,10 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
 
             case self::GCM_CREDENTIALS:
                 return new GCMCredentials($credentials);
+                break;
+
+            case self::MPNS_CREDENTIALS:
+                return new MPNSCredentials($credentials);
                 break;
 
             default:

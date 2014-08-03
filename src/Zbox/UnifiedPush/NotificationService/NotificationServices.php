@@ -19,6 +19,7 @@ class NotificationServices
 {
     const APPLE_PUSH_NOTIFICATIONS_SERVICE     = 'APNS';
     const GOOGLE_CLOUD_MESSAGING               = 'GCM';
+    const MICROSOFT_PUSH_NOTIFICATIONS_SERVICE = 'MPNS';
 
     /**
      * Checks if notification service is supported
@@ -31,7 +32,8 @@ class NotificationServices
     {
         if (!in_array($serviceName, array(
             self::APPLE_PUSH_NOTIFICATIONS_SERVICE,
-            self::GOOGLE_CLOUD_MESSAGING
+            self::GOOGLE_CLOUD_MESSAGING,
+			self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE,
         ))) {
             throw new DomainException(sprintf("Notification service '%s' is not supported.", $serviceName));
         }

@@ -28,5 +28,12 @@
                 "port": 443
             }
         }
+    },
+    "MPNS": {
+        "gateway": {
+            "production": {
+                "host": "sn1.notify.live.net/throttledthirdparty/01.00/[TOKEN]",
+            }
+        }
     }
 }
