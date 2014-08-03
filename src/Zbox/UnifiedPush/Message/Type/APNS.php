@@ -7,16 +7,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Zbox\UnifiedPush\Message;
+namespace Zbox\UnifiedPush\Message\Type;
 
-use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+use Zbox\UnifiedPush\Message\MessageBase;
 use Zbox\UnifiedPush\NotificationService\NotificationServices;
+use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
 /**
- * Class APNSMessage
- * @package Zbox\UnifiedPush\Message
+ * Class APNS
+ * @package Zbox\UnifiedPush\Message\Type
  */
-class APNSMessage extends MessageBase
+class APNS extends MessageBase
 {
     /**
      * The maximum size allowed for an iOS notification payload is 256 bytes

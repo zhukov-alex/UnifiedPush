@@ -7,16 +7,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Zbox\UnifiedPush\Message;
+namespace Zbox\UnifiedPush\Message\Type;
 
-use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+use Zbox\UnifiedPush\Message\MessageBase;
 use Zbox\UnifiedPush\NotificationService\NotificationServices;
+use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
 /**
- * Class GCMMessage
- * @package Zbox\UnifiedPush\Message
+ * Class GCM
+ * @package Zbox\UnifiedPush\Message\Type
  */
-class GCMMessage extends MessageBase
+class GCM extends MessageBase
 {
     /**
      * The maximum size allowed for an Android notification payload is 4096 bytes

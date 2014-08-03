@@ -2,6 +2,8 @@
 
 namespace Zbox\UnifiedPush\Message;
 
+use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
+use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
 use Zbox\UnifiedPush\Message\Type\MPNSRaw as MPNSRawMessage;
 
 class RecipientDeviceTest extends \PHPUnit_Framework_TestCase
