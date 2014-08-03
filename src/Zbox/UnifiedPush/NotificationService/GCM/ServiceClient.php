@@ -41,7 +41,7 @@ class ServiceClient extends ServiceClientBase
      * Body contains more information about the status of the message. When the request is rejected,
      * the HTTP response contains a non-200 status code.
      *
-     * @param string $notification
+     * @param array $notification
      * @throws ClientException
      * @return bool
      */
@@ -55,7 +55,7 @@ class ServiceClient extends ServiceClientBase
             $headers[] = 'Authorization: key='.$credentials->getAuthToken();
             $headers[] = 'Content-Type: application/json';
 
-            $response = $connection->post($serviceURL, $headers, $notification);
+            $response = $connection->post($serviceURL, $headers, $notification['body']);
             $connection->getClient()->flush();
 
         } catch (\Exception $e) {

@@ -65,7 +65,7 @@ class ServiceClient extends ServiceClientBase
      * nothing is returned. If you send a notification that is malformed
      * or otherwise unintelligible, APNs returns an error-response packet
      *
-     * @param string $notification
+     * @param array $notification
      * @throws ClientException
      * @return bool
      */
@@ -73,7 +73,7 @@ class ServiceClient extends ServiceClientBase
     {
         try {
             $connection = $this->getClientConnection();
-            $connection->write($notification);
+            $connection->write($notification['body']);
 
             $errorResponseData = $connection->read(Response::ERROR_RESPONSE_LENGTH);
 

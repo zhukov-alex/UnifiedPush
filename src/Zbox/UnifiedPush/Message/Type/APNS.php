@@ -226,11 +226,11 @@ class APNS extends MessageBase
     }
 
     /**
-     * Pack message into binary string
+     * Pack message body into binary string
      *
      * @param string $message
      * @param array $recipientsIds
-     * @return string
+     * @return array
      */
     public function packMessage($message, $recipientsIds)
     {
@@ -245,7 +245,7 @@ class APNS extends MessageBase
 
         $notification .= $message;
 
-        return $notification;
+        return array('body' => $notification);
     }
 
     /**

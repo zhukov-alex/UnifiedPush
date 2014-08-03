@@ -185,14 +185,12 @@ class GCM extends MessageBase
     }
 
     /**
-     * No packing is required
-     *
      * @param string $message
-     * @return string
+     * @return array
      */
     public function packMessage($message)
     {
-        return $message;
+        return array('body' => $message);
     }
 
     /**
