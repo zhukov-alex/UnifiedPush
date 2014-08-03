@@ -1,5 +1,5 @@
 {
-    "name": "UnifiedPush",
+    "name": "zbox/unified-push",
     "description": "Unified Push supports push notifications for iOS, Android and Windows Phone devices via APNs, GCM and MPNS",
     "type": "library",
     "keywords": ["apns", "apn", "gcm", "mpns", "push", "notification", "message", "apple", "android", "iphone", "windows phone"],
