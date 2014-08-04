@@ -20,7 +20,7 @@ use Zbox\UnifiedPush\Exception\DomainException,
  */
 class Application
 {
-    const APPS_CREDENTIALS_PATH = 'credentials.json';
+    const APPS_CREDENTIALS_FILENAME = 'applications_credentials.json';
 
     /**
      * @var array
@@ -57,7 +57,7 @@ class Application
     {
         $filePath = __DIR__
             . DIRECTORY_SEPARATOR . 'Resources'
-            . DIRECTORY_SEPARATOR . self::APPS_CREDENTIALS_PATH;
+            . DIRECTORY_SEPARATOR . self::APPS_CREDENTIALS_FILENAME;
 
         if (!file_exists($filePath)) {
             throw new InvalidArgumentException(
@@ -73,7 +73,7 @@ class Application
      *
      * @return \ArrayIterator
      */
-    public function getMessages()
+    public function getMessagesIterator()
     {
         return $this->messages->getIterator();
     }

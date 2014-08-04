@@ -179,16 +179,16 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
-     * Tries to deliver all enqueue messages to notification service
+     * Tries to dispatch all messages to notification service
      *
      * @return bool
      * @throws ClientException
      * @throws RuntimeException
      * @throws \Exception
      */
-    public function sendQueue()
+    public function dispatch()
     {
-        $messages = $this->application->getMessages();
+        $messages = $this->application->getMessagesIterator();
 
         try {
             while ($messages->valid()) {
