@@ -17,10 +17,11 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider createMessageProvider
      */
-    public function testCreateMessage($messageType, $messageSample)
+    public function testCreateMessage($messageType, $deviceToken, $messageSample)
     {
         $message         = $this->createMessageOfType($messageType);
-        $registrationIds = array('device1', 'device2');
+        $recipient       = new RecipientDevice($deviceToken, $message);
+        $registrationIds = array($recipient);
 
         $this->assertEquals(
             $messageSample,
@@ -36,6 +37,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         return array(
             'TestApnsMessage' => array(
                 self::APNS_MESSAGE,
+                '4efa148eb41f2e7103f21410bf48346c1afa148eb41f2e7103f21410bf48346c',
                 array(
                     'aps' => array(
                         'alert' => 'Text of an alert',
@@ -47,15 +49,17 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             )),
             'TestGCMMessage' => array(
                 self::GCM_MESSAGE,
+                'device1',
                 array(
                     'collapse_key'     => 1,
                     'delay_while_idle' => true,
-                    'registration_ids' => array('device1', 'device2'),
+                    'registration_ids' => array('device1'),
                     'data'             => array('key' => 'val'),
                     'time_to_live'     => 10
             )),
             'TestMPNSMessage' => array(
                 self::MPNS_MESSAGE,
+                'ZGV2aWNlIGlkZW50aWZpZXI=',
                 self::exampleMPNSMessage()
             )
         );
@@ -71,8 +75,6 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         if (!$isVaid) {
             $this->setExpectedException('Zbox\UnifiedPush\Exception\InvalidArgumentException');
         }
-
-        $this->setExpectedException('Zbox\UnifiedPush\Exception\InvalidArgumentException');
 
         $this->assertEquals(
             $message->validateRecipient($token),
@@ -205,7 +207,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $message      = new \DOMDocument("1.0", "utf-8");
         $baseElement  = $message->createElement("wp:Notification");
         $baseElement->setAttribute("xmlns:wp", "WPNotification");
-        $message->appendChild($element);
+        $message->appendChild($baseElement);
 
         $rootElement = $message->createElement("root");
         $baseElement->appendChild($rootElement);

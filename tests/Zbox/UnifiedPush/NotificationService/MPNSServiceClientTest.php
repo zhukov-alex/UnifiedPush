@@ -5,7 +5,7 @@ namespace Zbox\UnifiedPush\NotificationService;
 use Zbox\UnifiedPush\NotificationService\MPNS\Credentials as MPNSCredentials;
 use Zbox\UnifiedPush\NotificationService\MPNS\ServiceClient;
 
-class GCMServiceClientTest extends \PHPUnit_Framework_TestCase
+class MPNSServiceClientTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreation()
     {

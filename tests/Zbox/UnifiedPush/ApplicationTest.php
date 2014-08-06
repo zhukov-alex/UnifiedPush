@@ -70,7 +70,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'InitializedServices' => array(
-                array('APNS', 'GCM')
+                array('APNS', 'GCM', 'MPNS')
             )
         );
     }

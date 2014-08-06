@@ -64,7 +64,7 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
                 array(
                     'authToken' => 'testToken'
                 ),
-                true
+                false
             )
         );
     }
