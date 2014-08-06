@@ -61,13 +61,20 @@ class NotificationBuilder
      */
     public function buildNotifications()
     {
-        $message     = $this->message;
-        $recipients  = $message->getRecipientCollection()->getArrayCopy();
+        $message        = $this->message;
+        $recipientQueue = new \SplQueue();
 
-        $chunks = array_chunk($recipients, $message->getMaxRecipientsPerMessage());
+        while ($recipient = $message->getRecipient()) {
+            $recipientChunk[] = $recipient;
 
-        foreach ($chunks as $chunk) {
-            $notification = $this->buildNotification($chunk);
+            if (count($recipientChunk) >= $message->getMaxRecipientsPerMessage()) {
+                $recipientQueue->enqueue($recipientChunk);
+                unset($recipientChunk);
+            }
+        }
+
+        while ($recipients = $recipientQueue->dequeue()) {
+            $notification = $this->buildNotification($recipients);
             $this->notifications->append($notification);
         }
 
@@ -77,13 +84,13 @@ class NotificationBuilder
     /**
      * Returns validated and encoded message
      *
-     * @param array $recipientIds
+     * @param array $recipients
      * @return array
      */
-    private function buildNotification($recipientIds)
+    private function buildNotification($recipients)
     {
         $message         = $this->message;
-        $messageData     = $message->createMessage($recipientIds);
+        $messageData     = $message->createMessage($recipients);
 
         if (is_string($messageData)) {
             $messageData = JsonEncoder::jsonEncode($messageData);
@@ -91,7 +98,7 @@ class NotificationBuilder
 
         $this->validatePayload($messageData);
 
-        $notification = $message->packMessage($messageData, $recipientIds);
+        $notification = $message->packMessage($messageData, $recipients);
 
         return $notification;
     }

@@ -55,7 +55,7 @@ class ServiceClient extends ServiceClientBase
         try {
             $connection  = $this->getClientConnection();
             $serviceURL  = $this->getServiceURL();
-            $serviceURL['host'] = str_replace('[TOKEN]', $notification['recipient'], $serviceURL['host']);
+            $serviceURL['host'] = str_replace('[TOKEN]', $notification['recipients'][0], $serviceURL['host']);
 
             $headers[] = 'Accept: application/*';
             $headers[] = 'Content-Type: text/xml';
@@ -71,7 +71,7 @@ class ServiceClient extends ServiceClientBase
             throw new ClientException($e->getMessage());
         }
 
-        new Response($response);
+        new Response($response, $notification['recipients']);
 
         return true;
     }

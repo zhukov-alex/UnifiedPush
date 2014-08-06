@@ -229,23 +229,26 @@ class APNS extends MessageBase
      * Pack message body into binary string
      *
      * @param string $message
-     * @param array $recipientsIds
+     * @param array $recipients
      * @return array
      */
-    public function packMessage($message, $recipientsIds)
+    public function packMessage($message, $recipients)
     {
-        $recipientId  = $this->getMessageIdentifier().'_'.$recipientsIds[0];
+        $recipientId  = $this->getMessageIdentifier().'_'.$recipients[0];
         $notification =
             pack('C', 1). // Command push
             pack('N', $recipientId).
             pack('N', $this->getExpirationTime()->format('U')).
             pack('n', 32). // Token binary length
-            pack('H*', $recipientsIds[0]);
+            pack('H*', $recipients[0]);
             pack('n', strlen($message));
 
         $notification .= $message;
 
-        return array('body' => $notification);
+        return array(
+            'body'       => $notification,
+            'recipients' => $recipients
+        );
     }
 
     /**

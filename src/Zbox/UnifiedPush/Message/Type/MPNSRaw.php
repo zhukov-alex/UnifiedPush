@@ -53,7 +53,7 @@ class MPNSRaw extends MPNSBase
         $message      = new \DOMDocument("1.0", "utf-8");
         $baseElement  = $message->createElement("wp:Notification");
         $baseElement->setAttribute("xmlns:wp", "WPNotification");
-        $message->appendChild($element);
+        $message->appendChild($baseElement);
 
         $rootElement = $message->createElement("root");
         $baseElement->appendChild($rootElement);

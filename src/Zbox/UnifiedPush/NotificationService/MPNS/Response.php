@@ -9,6 +9,8 @@
 
 namespace Zbox\UnifiedPush\NotificationService\MPNS;
 
+use Zbox\UnifiedPush\Message\RecipientDevice;
+use Zbox\UnifiedPush\Exception\InvalidRecipientException;
 use Zbox\UnifiedPush\Exception\DispatchMessageException;
 use Zbox\UnifiedPush\Exception\MalformedNotificationException;
 use Zbox\UnifiedPush\Exception\RuntimeException;
@@ -22,7 +24,7 @@ class Response
     const REQUEST_HAS_SUCCEED_CODE       = 200;
     const MALFORMED_NOTIFICATION_CODE    = 400;
     const AUTHENTICATION_ERROR_CODE      = 401;
-    const REFUSED_RECIPIENT_ERROR_CODE   = 404;
+    const INVALID_RECIPIENT_ERROR_CODE   = 404;
     const INVALID_METHOD_ERROR_CODE      = 405;
     const QUOTA_EXCEEDED_ERROR_CODE      = 406;
     const DEVICE_INACTIVE_ERROR_CODE     = 412;
@@ -30,22 +32,24 @@ class Response
 
     /**
      * @param Buzz\Message\MessageInterface $response
+     * @param array $recipients
      */
-    public function __construct(Buzz\Message\MessageInterface $response)
+    public function __construct(Buzz\Message\MessageInterface $response, array $recipients)
     {
         $statusCode = $response->getStatusCode();
-        $this->checkResponseCode($statusCode);
+        $this->checkResponseCode($statusCode, $recipients);
     }
 
     /**
      * Checks if response has succeed code or request was rejected
      *
      * @param int $responseCode
-     * @throws MalformedNotificationException
-     * @throws DispatchMessageException
-     * @throws RuntimeException
+     * @param array $recipients
+     * @throws \Zbox\UnifiedPush\Exception\MalformedNotificationException
+     * @throws \Zbox\UnifiedPush\Exception\DispatchMessageException
+     * @throws \Zbox\UnifiedPush\Exception\RuntimeException
      */
-    private function checkResponseCode($responseCode)
+    private function checkResponseCode($responseCode, $recipients)
     {
         switch ($responseCode) {
             case self::REQUEST_HAS_SUCCEED_CODE:
@@ -63,9 +67,12 @@ class Response
                 );
                 break;
 
-            case self::REFUSED_RECIPIENT_ERROR_CODE:
-                throw new DispatchMessageException(
-                    "The subscription is invalid and is not present on the Push Notification Service"
+            case self::INVALID_RECIPIENT_ERROR_CODE:
+                $recipients[0]->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
+
+                throw new InvalidRecipientException(
+                    "The subscription is invalid and is not present on the Push Notification Service",
+                    $recipients
                 );
                 break;
 

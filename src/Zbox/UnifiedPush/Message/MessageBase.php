@@ -43,7 +43,7 @@ abstract class MessageBase implements MessageInterface
 
 
     /**
-     * Collection of recipient devices identifiers
+     * Collection of recipient devices
      *
      * @var \ArrayIterator
      */

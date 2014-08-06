@@ -35,7 +35,7 @@ class Application
     /**
      * @var \ArrayIterator
      */
-    private $refusedRecipients;
+    private $invalidRecipients;
 
     /**
      * @param string $applicationName
@@ -107,19 +107,19 @@ class Application
     /**
      * @return \ArrayIterator
      */
-    public function getRefusedRecipients()
+    public function getInvalidRecipients()
     {
-        return $this->refusedRecipients;
+        return $this->invalidRecipients;
     }
 
     /**
-     * Adds a refused recipient to collection
+     * Adds a invalid recipient to collection
      *
      * @param string $serviceName
-     * @param RecipientDevice $recipient
+     * @param RecipientDevice|string $recipient
      * @return $this
      */
-    public function addRefusedRecipient($serviceName, RecipientDevice $recipient)
+    public function addInvalidRecipient($serviceName, $recipient)
     {
         if (!in_array($serviceName, $this->getInitializedServices())) {
             throw new DomainException(
@@ -127,7 +127,12 @@ class Application
             );
         }
 
-        $this->refusedRecipients->append($recipient);
+        if (is_string($recipient)) {
+            $messageClassName = 'Zbox\UnifiedPush\Message\Type\\' . $serviceName;
+            $recipient        = new RecipientDevice($recipient, $messageClassName());
+        }
+
+        $this->invalidRecipients->append($recipient);
 
         return $this;
     }

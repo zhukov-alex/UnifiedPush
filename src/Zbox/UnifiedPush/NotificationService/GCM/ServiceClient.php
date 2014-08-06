@@ -62,7 +62,7 @@ class ServiceClient extends ServiceClientBase
             throw new ClientException($e->getMessage());
         }
 
-        new Response($response);
+        new Response($response, $notification['recipients']);
 
         return true;
     }

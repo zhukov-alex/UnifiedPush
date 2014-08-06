@@ -14,7 +14,8 @@ use Zbox\UnifiedPush\Message\MessageInterface,
 use Zbox\UnifiedPush\NotificationService\NotificationServices,
     Zbox\UnifiedPush\NotificationService\ServiceClientInterface,
     Zbox\UnifiedPush\NotificationService\ServiceClientFactory;
-use Zbox\UnifiedPush\Exception\DispatchMessageException,
+use Zbox\UnifiedPush\Exception\InvalidRecipientException,
+    Zbox\UnifiedPush\Exception\DispatchMessageException,
     Zbox\UnifiedPush\Exception\MalformedNotificationException,
     Zbox\UnifiedPush\Exception\ClientException,
     Zbox\UnifiedPush\Exception\RuntimeException;
@@ -148,8 +149,9 @@ class Dispatcher implements LoggerAwareInterface
      *
      * @param MessageInterface $message
      * @return bool
-     * @throws DispatchMessageException
-     * @throws MalformedNotificationException
+     * @throws Zbox\UnifiedPush\Exception\InvalidRecipientException
+     * @throws Zbox\UnifiedPush\Exception\DispatchMessageException
+     * @throws Zbox\UnifiedPush\Exception\MalformedNotificationException
      */
     private function sendMessage(MessageInterface $message)
     {
@@ -162,6 +164,11 @@ class Dispatcher implements LoggerAwareInterface
             try {
                 $connection = $this->getConnection($message->getMessageType());
                 $connection->sendNotification($notification);
+
+            } catch (InvalidRecipientException $e) {
+                while ($recipient = $e->getRecipient()) {
+                    $this->application->addInvalidRecipient($message->getMessageType(), $recipient);
+                }
 
             } catch (DispatchMessageException $e) {
                 $this->logger->warning(
@@ -182,8 +189,8 @@ class Dispatcher implements LoggerAwareInterface
      * Tries to dispatch all messages to notification service
      *
      * @return bool
-     * @throws ClientException
-     * @throws RuntimeException
+     * @throws Zbox\UnifiedPush\Exception\ClientException
+     * @throws Zbox\UnifiedPush\Exception\RuntimeException
      * @throws \Exception
      */
     public function dispatch()
@@ -233,12 +240,12 @@ class Dispatcher implements LoggerAwareInterface
             $this->logger->info(sprintf("Querying the feedback service '%s'"), $serviceName);
 
             $connection = $this->createFeedbackConnection($serviceName);
-            $refusedRecipients = $connection->readFeedback();
+            $invalidRecipients = $connection->readFeedback();
 
-            while ($refusedRecipients->valid()) {
-                $recipient = $refusedRecipients->current();
-                $this->application->addRefusedRecipient($serviceName, $recipient);
-                $refusedRecipients->next();
+            while ($invalidRecipients->valid()) {
+                $recipient = $invalidRecipients->current();
+                $this->application->addInvalidRecipient($serviceName, $recipient);
+                $invalidRecipients->next();
             }
 
         } catch (RuntimeException $e) {

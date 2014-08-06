@@ -166,12 +166,16 @@ class GCM extends MessageBase
     }
 
     /**
-     * @param array $registrationIds
+     * @param array $recipients
      * @return array
      */
-    public function createMessage($registrationIds)
+    public function createMessage($recipients)
     {
         $ttl = $this->getExpirationTime()->format('U') - time();
+
+        foreach ($recipients as $recipient) {
+            $registrationIds[] = $recipient->getIdentifier();
+        }
 
         $message = array(
             'collapse_key'      => $this->getCollapseKey(),
@@ -186,11 +190,15 @@ class GCM extends MessageBase
 
     /**
      * @param string $message
+     * @param array $recipients
      * @return array
      */
-    public function packMessage($message)
+    public function packMessage($message, $recipients)
     {
-        return array('body' => $message);
+        return array(
+            'body'       => $message,
+            'recipients' => $recipients
+        );
     }
 
     /**

@@ -115,9 +115,10 @@ class MPNSBase extends MessageBase
 
     /**
      * @param string $message
+     * @param array $recipients
      * @return array
      */
-    public function packMessage($message, $recipientIds)
+    public function packMessage($message, $recipients)
     {
         $options = array(
             'X-MessageID'           => $this->getMessageIdentifier(),
@@ -126,9 +127,9 @@ class MPNSBase extends MessageBase
         );
 
         return array(
-            'body'      => $message,
-            'options'   => $options,
-            'recipient' => $recipientIds[0]
+            'body'        => $message,
+            'recipients'  => $recipients,
+            'options'     => $options
         );
     }
 
@@ -137,7 +138,7 @@ class MPNSBase extends MessageBase
      */
     public function validateRecipient($token)
     {
-        if (base64_encode(base64_decode($token)) === $token) {
+        if (base64_encode(base64_decode($token)) !== $token) {
             throw new InvalidArgumentException(sprintf(
                 'Device token must be base64 string. Token given: "%s"',
                 $token

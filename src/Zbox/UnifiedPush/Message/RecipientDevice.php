@@ -18,6 +18,14 @@ use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 class RecipientDevice
 {
     /**
+     * Device identifier statuses
+     */
+    const DEVICE_ACTUAL                  = 1;
+    const DEVICE_NOT_READY               = 2;
+    const DEVICE_NOT_REGISTERED          = 3;
+    const IDENTIFIER_NEED_TO_BE_REPLACED = 4;
+
+    /**
      * Recipient device identifier
      *
      * @var string
@@ -25,12 +33,29 @@ class RecipientDevice
     private $identifier;
 
     /**
+     * Current status
+     *
+     * @var int
+     */
+    private $identifierStatus;
+
+    /**
+     *  Sender should replace the ID on future requests
+     * @var string
+     */
+    private $idToReplaceTo;
+
+    /**
      * @param string $deviceIdentifier
      * @param MessageInterface $message
+     * @return $this
      */
     public function __construct($deviceIdentifier, MessageInterface $message)
     {
         $this->setIdentifier($deviceIdentifier, $message);
+        $this->setIdentifierStatus(self::DEVICE_ACTUAL);
+
+        return $this;
     }
 
     /**
@@ -55,5 +80,51 @@ class RecipientDevice
         $this->identifier = $identifier;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIdentifierStatus()
+    {
+        return $this->identifierStatus;
+    }
+
+    /**
+     * @param int $identifierStatus
+     * @return $this
+     */
+    public function setIdentifierStatus($identifierStatus)
+    {
+        $this->identifierStatus = $identifierStatus;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getIdToReplaceTo()
+    {
+        return $this->idToReplaceTo;
+    }
+
+    /**
+     * @param string $idToReplaceTo
+     * @return $this
+     */
+    public function setIdToReplaceTo($idToReplaceTo)
+    {
+        $this->setIdentifierStatus(self::IDENTIFIER_NEED_TO_BE_REPLACED);
+        $this->idToReplaceTo = $idToReplaceTo;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getIdentifier();
     }
 }

@@ -82,7 +82,7 @@ class ServiceClient extends ServiceClientBase
         }
 
         if ($errorResponseData) {
-            new Response($errorResponseData);
+            new Response($errorResponseData, $notification['recipients']);
         }
         return true;
     }
@@ -104,14 +104,14 @@ class ServiceClient extends ServiceClientBase
             throw new ClientException($e->getMessage());
         }
 
-        $refusedRecipients = new \ArrayIterator();
+        $invalidRecipients = new \ArrayIterator();
 
         foreach (str_split($feedbackData, 38) as $item)
         {
             $deviceData = unpack('N1timestamp/n1length/H*token', $item);
-            $refusedRecipients->append($deviceData['token']);
+            $invalidRecipients->append($deviceData['token']);
         }
 
-        return $refusedRecipients;
+        return $invalidRecipients;
     }
 }

@@ -9,7 +9,9 @@
 
 namespace Zbox\UnifiedPush\NotificationService\APNS;
 
+use Zbox\UnifiedPush\Message\RecipientDevice;
 use Zbox\UnifiedPush\Exception\DispatchMessageException;
+use Zbox\UnifiedPush\Exception\InvalidRecipientException;
 use Zbox\UnifiedPush\Exception\RuntimeException;
 
 /**
@@ -59,10 +61,11 @@ class Response
 
     /**
      * @param string $binaryData
+     * @param array $recipients
      */
-    public function __construct($binaryData)
+    public function __construct($binaryData, array $recipients)
     {
-        $this->parseResponse($binaryData);
+        $this->parseResponse($binaryData, $recipients);
     }
 
     /**
@@ -70,7 +73,7 @@ class Response
      *
      * @param string $binaryData
      */
-    public function parseResponse($binaryData)
+    public function parseResponse($binaryData, $recipients)
     {
         $responseData = unpack("Ccommand/Cstatus/Nidentifier", $binaryData);
 
@@ -78,6 +81,14 @@ class Response
 
         $statusCode = $responseData['status'];
         $errorDescription = self::$responseDescription[$statusCode];
+
+        if (
+               $statusCode == self::ERROR_INVALID_TOKEN_SIZE
+            || $statusCode == self::ERROR_INVALID_TOKEN
+        ) {
+            $recipients[0]->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
+            throw new InvalidRecipientException($errorDescription, $recipients);
+        }
 
         throw new DispatchMessageException($errorDescription, $statusCode);
     }

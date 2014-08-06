@@ -47,6 +47,7 @@ class Credentials implements CredentialsInterface
     {
         if (empty($credentials)) {
             $this->setAuthenticated(false);
+            return $this;
         }
 
         $object = (object) $credentials;

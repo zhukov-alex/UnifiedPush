@@ -32,7 +32,7 @@
     "MPNS": {
         "gateway": {
             "production": {
-                "host": "sn1.notify.live.net/throttledthirdparty/01.00/[TOKEN]",
+                "host": "sn1.notify.live.net/throttledthirdparty/01.00/[TOKEN]"
             }
         }
     }
