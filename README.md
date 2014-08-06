@@ -27,52 +27,70 @@ The recommended way to install UnifiedPush is [through composer](http://getcompo
 
 ## Usage
 
-### Create message
-Create a message of one of supported types.
-
-```php
-	use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
-	use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
-
-	$message1 = new APNSMessage();
-	$message1
-		->setSound('alert')
-		->getBadge('2');
-
-	$message1->addRecipients(array('deviceToken1', 'deviceToken2'));
-
-	$message2 = new GCMMessage();
-	$message2
-		->setCollapseKey('key')
-		->addRecipients(array('deviceToken1', 'deviceToken2'))
-		->setPayloadData(array(
-			'keyA' => 'value1',
-			'keyB' => 'value2',
-			)
-		);
-```
-
 ### Load application credentials
 
-Load available notification services and authentication credentials for selected application, then add messages to collection.
+Load available notification services and authentication credentials for selected application.
 
 ```php
-$application = new Zbox\UnifiedPush\Application('myApp1');
+<?php
+
+$application = new Zbox\UnifiedPush\Application('myApplication');
+```
+
+### Create message
+Create a message of one of supported types, then add messages to collection.
+
+```php
+<?php
+
+use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
+use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
+
+$message1 = new APNSMessage();
+$message1
+	->setSound('alert')
+	->getBadge('2');
+
+$message1->addRecipients(array('deviceToken1', 'deviceToken2'));
+
+$message2 = new GCMMessage();
+$message2
+	->setCollapseKey('key')
+	->addRecipients(array('deviceToken1', 'deviceToken2'))
+	->setPayloadData(array(
+		'keyA' => 'value1',
+		'keyB' => 'value2',
+		)
+	);
+
 $application->addMessage($message1);
 $application->addMessage($message2);
 ```
 
 ### Initialize dispatcher
 
-Initialize dispatcher, then set environment and try to send message queue, then try to load feedback (for services, where available). Then get report of any refused recipients.
+Initialize dispatcher, then set environment and try to send message queue, then try to load feedback (for services, where available). Then get report of any invalid recipient device identifiers.
 
 ```php
-$dispatcher = new Zbox\UnifiedPush\Dispatcher($application);
-$dispatcher->setDevelopmentMode(true);
-$dispatcher->sendQueue();
-$dispatcher->loadFeedback();
+<?php
 
-$application->getRefusedRecipients();
+$dispatcher = new Zbox\UnifiedPush\Dispatcher($application);
+
+$dispatcher->setDevelopmentMode(true);
+
+$dispatcher->dispatch(); // sending all messages
+$dispatcher->loadFeedback();
+```
+
+### Get report
+
+Get report about failed devices.
+
+
+```php
+<?php
+
+$application->getInvalidRecipients();
 ```
 
 ## License
