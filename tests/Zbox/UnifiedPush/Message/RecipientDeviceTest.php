@@ -39,8 +39,7 @@ class RecipientDeviceTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'GCM message' => array(new GCMMessage(), true),
-            'APNS message' => array(new APNSMessage(), false),
-            'MPNS message' => array(new MPNSRawMessage(), false)
+            'APNS message' => array(new APNSMessage(), false)
         );
     }
 }

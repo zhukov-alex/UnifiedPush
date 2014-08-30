@@ -130,6 +130,8 @@ class Application
         if (is_string($recipient)) {
             $messageClassName = 'Zbox\UnifiedPush\Message\Type\\' . $serviceName;
             $recipient        = new RecipientDevice($recipient, $messageClassName());
+
+            $recipient->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
         }
 
         $this->invalidRecipients->append($recipient);

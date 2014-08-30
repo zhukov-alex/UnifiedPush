@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\Message;
 
+use Zbox\UnifiedPush\Exception\DomainException;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
 /**
@@ -96,10 +97,18 @@ class RecipientDevice
      */
     public function setIdentifierStatus($identifierStatus)
     {
+        if (!in_array($identifierStatus, array(
+            self::DEVICE_ACTUAL,
+            self::DEVICE_NOT_READY,
+            self::DEVICE_NOT_REGISTERED,
+            self::IDENTIFIER_NEED_TO_BE_REPLACED
+        ))) {
+            throw new DomainException("Unknown status of device identifier");
+        }
+
         $this->identifierStatus = $identifierStatus;
         return $this;
     }
-
 
     /**
      * @return string

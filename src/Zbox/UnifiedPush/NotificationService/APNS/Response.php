@@ -72,6 +72,7 @@ class Response
      * Unpacks response data
      *
      * @param string $binaryData
+     * @param array $recipients
      */
     public function parseResponse($binaryData, $recipients)
     {
@@ -112,4 +113,3 @@ class Response
         return $this;
     }
 }
-

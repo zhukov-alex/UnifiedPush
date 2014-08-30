@@ -23,7 +23,7 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException('Zbox\UnifiedPush\Exception\InvalidArgumentException');
         }
 
-        $credentials = $this->createCredentialsOfType($serviceType, $credentials);
+        $this->createCredentialsOfType($serviceType, $credentials);
     }
 
     /**
