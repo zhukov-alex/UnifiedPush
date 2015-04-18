@@ -161,6 +161,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $message
             ->setAlert('Text of an alert')
             ->setSound('test')
+            ->setCategory('test')
             ->setBadge(1)
             ->setContentAvailable(true)
             ->setCustomPayloadData(array('key' => 'val'))

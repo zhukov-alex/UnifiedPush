@@ -20,9 +20,10 @@ use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 class APNS extends MessageBase
 {
     /**
-     * The maximum size allowed for an iOS notification payload is 256 bytes
+     * The maximum size allowed for an iOS notification payload is 2 kilobytes
+     * Prior to iOS 8 and in OS X, the maximum payload size is 256 bytes
      */
-    const PAYLOAD_MAX_LENGTH = 256;
+    const PAYLOAD_MAX_LENGTH = 2048;
 
     /**
      * APNs does not support multicast sending
@@ -58,6 +59,13 @@ class APNS extends MessageBase
      * @var string
      */
     private $sound;
+
+    /**
+     * Category option for custom notification actions (iOS 8+)
+     *
+     * @var string
+     */
+    private $category;
 
     /**
      * Provide this key with a value of 1 to indicate that new content is available
@@ -206,6 +214,28 @@ class APNS extends MessageBase
     }
 
     /**
+     * @return string
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param string $category
+     * @return $this
+     */
+    public function setCategory($category)
+    {
+        if (!is_scalar($category)) {
+            $this->invalidArgumentException('Category', 'an string');
+        }
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function createMessage()
@@ -215,6 +245,7 @@ class APNS extends MessageBase
                 'alert' => $this->getAlert(),
                 'badge' => $this->getBadge(),
                 'sound' => $this->getSound(),
+                'category' => $this->getCategory(),
             )
         );
 
