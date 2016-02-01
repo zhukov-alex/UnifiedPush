@@ -1,5 +1,8 @@
 Unified Push
 ========================
+[![Build Status](https://scrutinizer-ci.com/g/zbox/UnifiedPush/badges/build.png?b=master)](https://scrutinizer-ci.com/g/zbox/UnifiedPush/build-status/master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/zbox/UnifiedPush/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/zbox/UnifiedPush/?branch=master)
+
 Unified Push supports push notifications for iOS, Android and Windows Phone devices via APNs, GCM and MPNS
 
 ## Install
