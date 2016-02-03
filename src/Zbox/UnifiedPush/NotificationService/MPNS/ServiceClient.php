@@ -28,7 +28,7 @@ class ServiceClient extends ServiceClientBase
      */
     protected function createClient()
     {
-        $client = MultiCurl();
+        $client = new MultiCurl();
 
         $credentials      = $this->getCredentials();
         $isAuthenticated  = $credentials->isAuthenticated();

@@ -28,7 +28,7 @@ class ServiceClient extends ServiceClientBase
      */
     protected function createClient()
     {
-        $client = MultiCurl();
+        $client = new MultiCurl();
         $client->setVerifyPeer(false);
 
         $this->serviceClient = new Browser($client);
