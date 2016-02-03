@@ -43,6 +43,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                         'alert' => 'Text of an alert',
                         'badge' => 1,
                         'sound' => 'test',
+                        'category' => 'test',
                         'content-available' => 1
                     ),
                     'key' => 'val'

@@ -1,6 +1,6 @@
 <?php
 
-$autoloaderPath = __DIR__ . '/../autoload.php';
+$autoloaderPath = dirname(__DIR__) . '/vendor/autoload.php';
 
 if ($autoloaderPath) {
 	require_once $autoloaderPath;
