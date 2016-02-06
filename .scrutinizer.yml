@@ -25,7 +25,6 @@ tools:
     # Code Coverage
     php_code_coverage:
         enabled:              true
-        test_command:         phpunit
         filter:
             excluded_paths:
                 - 'tests/*'
@@ -34,7 +33,6 @@ tools:
     # Code Sniffer
     php_code_sniffer:
         enabled:              true
-        command:              phpcs
         config:
             standard:         PSR2
         filter:
@@ -83,6 +81,9 @@ tools:
     # Runs Scrutinizer's PHP Analyzer Tool
     php_analyzer:
         enabled:              true
+        config:
+            verify_php_doc_comments:
+                suggest_more_specific_types: false
         filter:
             excluded_paths:
               - 'tests/*'
