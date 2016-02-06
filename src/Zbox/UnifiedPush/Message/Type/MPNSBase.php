@@ -12,6 +12,7 @@ namespace Zbox\UnifiedPush\Message\Type;
 use Zbox\UnifiedPush\Message\MessageBase;
 use Zbox\UnifiedPush\NotificationService\NotificationServices;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+use Zbox\UnifiedPush\Exception\BadMethodCallException;
 
 /**
  * Class MPNSBase
@@ -34,7 +35,7 @@ class MPNSBase extends MessageBase
      *
      * @var int
      */
-    protected $expirationTime;
+    protected $delayInterval;
 
     /**
      * @return string
@@ -45,30 +46,40 @@ class MPNSBase extends MessageBase
     }
 
     /**
-     * @return int
+     * No expiration time available in MPN
+     *
+     * @throws BadMethodCallException
      */
     public function getExpirationTime()
     {
-        if (!$this->expirationTime) {
-            $this->setExpirationTime(static::DELAY_INTERVAL_IMMEDIATE);
-        }
-        return $this->expirationTime;
+        throw new BadMethodCallException("No expiration time available in MPN");
     }
 
     /**
-     * @param int $expirationTime
+     * @return int
+     */
+    public function getDelayInterval()
+    {
+        if (!$this->delayInterval) {
+            $this->setDelayInterval(static::DELAY_INTERVAL_IMMEDIATE);
+        }
+        return $this->delayInterval;
+    }
+
+    /**
+     * @param int $delayInterval
      * @return $this
      */
-    public function setExpirationTime($expirationTime)
+    public function setDelayInterval($delayInterval)
     {
-        if (!in_array($expirationTime, array(
+        if (!in_array($delayInterval, array(
             static::DELAY_INTERVAL_IMMEDIATE,
             static::DELAY_INTERVAL_450,
             static::DELAY_INTERVAL_900
         ))) {
             throw new InvalidArgumentException('Delivery interval must be equal one of predefined interval flag');
         }
-        $this->expirationTime = $expirationTime;
+        $this->delayInterval = $delayInterval;
 
         return $this;
     }
@@ -83,7 +94,7 @@ class MPNSBase extends MessageBase
         $message      = new \DOMDocument("1.0", "utf-8");
         $baseElement  = $message->createElement("wp:Notification");
         $baseElement->setAttribute("xmlns:wp", "WPNotification");
-        $message->appendChild($element);
+        $message->appendChild($baseElement);
 
         $rootElement = $message->createElement("wp:" . $messageType);
         $baseElement->appendChild($rootElement);
@@ -122,7 +133,7 @@ class MPNSBase extends MessageBase
     {
         $options = array(
             'X-MessageID'           => $this->getMessageIdentifier(),
-            'X-NotificationClass'   => $this->getExpirationTime(),
+            'X-NotificationClass'   => $this->getDelayInterval(),
             'X-WindowsPhone-Target' => static::MESSAGE_TYPE
         );
 
