@@ -26,7 +26,7 @@ class MPNSRaw extends MPNSBase
     /**
      * Custom payload parameters
      *
-     * @var arrray
+     * @var array
      */
     private $_payload;
 
