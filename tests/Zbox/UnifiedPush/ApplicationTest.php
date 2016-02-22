@@ -11,7 +11,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->application = $this->getMockBuilder('\Zbox\UnifiedPush\Application')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(self::TEST_APPLICATION_NAME))
             ->setMethods(array('getCredentialsFilepath'))
             ->getMock();
 
@@ -20,7 +20,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             ->method('getCredentialsFilepath')
             ->will($this->returnValue($this->getAppConfigPath()));
 
-        $this->application->loadApplicationConfig(self::TEST_APPLICATION_NAME);
+        $this->application->loadApplicationConfig();
     }
 
     /**

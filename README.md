@@ -38,6 +38,7 @@ Load available notification services and authentication credentials for selected
 <?php
 
 $application = new Zbox\UnifiedPush\Application('myApplication');
+$application->setCredentialsFilePath($filePath);
 ```
 
 ### Create message
@@ -54,12 +55,17 @@ $message1
 	->setSound('alert')
 	->getBadge('2');
 
-$message1->addRecipients(array('deviceToken1', 'deviceToken2'));
+$message1->addRecipient('deviceToken1');
 
 $message2 = new GCMMessage();
 $message2
 	->setCollapseKey('key')
-	->addRecipients(array('deviceToken1', 'deviceToken2'))
+	->setRecipientCollection(
+		new ArrayIterator([
+			'deviceToken1', 
+			'deviceToken2'
+		])
+	)
 	->setPayloadData(array(
 		'keyA' => 'value1',
 		'keyB' => 'value2',

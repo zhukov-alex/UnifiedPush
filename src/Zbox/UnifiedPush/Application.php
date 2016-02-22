@@ -23,6 +23,16 @@ class Application
     const APPS_CREDENTIALS_FILENAME = 'applications_credentials.json';
 
     /**
+     * @var string
+     */
+    private $credentialsFilePath;
+
+    /**
+     * @var string
+     */
+    private $applicationName;
+
+    /**
      * @var array
      */
     private $config;
@@ -42,7 +52,7 @@ class Application
      */
     public function __construct($applicationName)
     {
-        $this->loadApplicationConfig($applicationName);
+        $this->setApplicationName($applicationName);
         $this->messages = new \ArrayObject();
 
         return $this;
@@ -53,19 +63,48 @@ class Application
      *
      * @return string
      */
-    public function getCredentialsFilepath()
+    public function getCredentialsFilePath()
     {
-        $filePath = __DIR__
-            . DIRECTORY_SEPARATOR . 'Resources'
-            . DIRECTORY_SEPARATOR . self::APPS_CREDENTIALS_FILENAME;
+        if (!file_exists($this->credentialsFilePath)) {
+            $credentialsDistFilename = sprintf('%s.dist', static::APPS_CREDENTIALS_FILENAME);
 
-        if (!file_exists($filePath)) {
             throw new InvalidArgumentException(
-                sprintf("Application credentials file '%s' not exists.", $filePath)
+                sprintf(
+                    "Application credentials file '%s' not exists. See example %s",
+                    $this->credentialsFilePath,
+                    $credentialsDistFilename
+                )
             );
         }
+        return $this->credentialsFilePath;
+    }
 
-        return $filePath;
+    /**
+     * @param string $filePath
+     * @return $this
+     */
+    public function setCredentialsFilePath($filePath)
+    {
+        $this->credentialsFilePath = $filePath;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApplicationName()
+    {
+        return $this->applicationName;
+    }
+
+    /**
+     * @param string $applicationName
+     * @return $this
+     */
+    public function setApplicationName($applicationName)
+    {
+        $this->applicationName = $applicationName;
+        return $this;
     }
 
     /**
@@ -158,6 +197,10 @@ class Application
      */
     public function getCredentialsByService($serviceName)
     {
+        if ($this->getApplicationName() && !$this->config) {
+            $this->loadApplicationConfig();
+        }
+
         if (!in_array($serviceName, $this->getInitializedServices())) {
             throw new DomainException(
                 sprintf("Credentials for service '%s' was not initialized", $serviceName)
@@ -169,14 +212,15 @@ class Application
     /**
      * Load sender`s notification services credentials by application name
      *
-     * @param string $applicationName
      * @return $this
      * @throws DomainException
      */
-    public function loadApplicationConfig($applicationName)
+    public function loadApplicationConfig()
     {
         $configFilePath = $this->getCredentialsFilepath();
         $applicationsConfig = json_decode(file_get_contents($configFilePath), true);
+
+        $applicationName = $this->getApplicationName();
 
         if (!array_key_exists($applicationName, $applicationsConfig)) {
             throw new DomainException(
