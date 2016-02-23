@@ -98,7 +98,7 @@ class Dispatcher implements LoggerAwareInterface
      */
     public function getConnection($serviceName)
     {
-        if (!empty($this->connectionPool[$serviceName])) {
+        if (empty($this->connectionPool[$serviceName])) {
             $this->initConnection($serviceName);
         }
 
@@ -201,7 +201,7 @@ class Dispatcher implements LoggerAwareInterface
             while ($messages->valid()) {
                 $message = $messages->current();
                 if ($this->sendMessage($message)) {
-                    $this->application->unsetMessage($message);
+                    $messages->offsetUnset($message->getMessageIdentifier());
                 }
                 $messages->next();
             }
@@ -237,7 +237,7 @@ class Dispatcher implements LoggerAwareInterface
         $serviceName = NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE;
 
         try {
-            $this->logger->info(sprintf("Querying the feedback service '%s'"), $serviceName);
+            $this->logger->info(sprintf("Querying the feedback service '%s'", $serviceName));
 
             $connection = $this->createFeedbackConnection($serviceName);
             $invalidRecipients = $connection->readFeedback();

@@ -55,7 +55,7 @@ class NotificationBuilder
 
     /**
      * Generates number of notifications by message recipient count
-     * and notification service limititations
+     * and notification service limitations
      *
      * @return $this
      */
@@ -69,12 +69,16 @@ class NotificationBuilder
 
             if (count($recipientChunk) >= $message->getMaxRecipientsPerMessage()) {
                 $recipientQueue->enqueue($recipientChunk);
-                unset($recipientChunk);
+                $recipientChunk = [];
             }
         }
 
-        while ($recipients = $recipientQueue->dequeue()) {
-            $notification = $this->buildNotification($recipients);
+        if (!empty($recipientChunk)) {
+            $recipientQueue->enqueue($recipientChunk);
+        }
+
+        while (!$recipientQueue->isEmpty()) {
+            $notification = $this->buildNotification($recipientQueue->dequeue());
             $this->notifications->append($notification);
         }
 
@@ -92,7 +96,7 @@ class NotificationBuilder
         $message         = $this->message;
         $messageData     = $message->createMessage($recipients);
 
-        if (is_string($messageData)) {
+        if (is_array($messageData)) {
             $messageData = JsonEncoder::jsonEncode($messageData);
         }
 

@@ -24,15 +24,14 @@
     "GCM": {
         "push": {
             "production": {
-                "host": "android.googleapis.com/gcm/send",
-                "port": 443
+                "url": "https://android.googleapis.com/gcm/send"
             }
         }
     },
     "MPNS": {
-        "gateway": {
+        "push": {
             "production": {
-                "host": "sn1.notify.live.net/throttledthirdparty/01.00/[TOKEN]"
+                "url": "http://sn1.notify.live.net/throttledthirdparty/01.00/[TOKEN]"
             }
         }
     }

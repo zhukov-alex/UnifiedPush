@@ -90,6 +90,10 @@ class ServiceClientFactory
         $serviceType = $isFeedback ? self::FEEDBACK_SERVICE : self::PUSH_SERVICE;
         $environment = $this->getEnvironment();
 
+        if (empty($this->config[$serviceName][$serviceType][static::ENVIRONMENT_DEVELOPMENT])) {
+            $environment = static::ENVIRONMENT_PRODUCTION;
+        }
+
         if (empty($this->config[$serviceName][$serviceType][$environment])) {
             throw new DomainException("Service url is not defined");
         }
