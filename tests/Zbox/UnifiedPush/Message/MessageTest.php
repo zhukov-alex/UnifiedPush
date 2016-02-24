@@ -56,7 +56,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                     'delay_while_idle' => true,
                     'registration_ids' => array('device1'),
                     'data'             => array('key' => 'val'),
-                    'time_to_live'     => 10
+                    'time_to_live'     => 10,
+                    'dry_run'          => true
             )),
             'TestMPNSMessage' => array(
                 self::MPNS_MESSAGE,

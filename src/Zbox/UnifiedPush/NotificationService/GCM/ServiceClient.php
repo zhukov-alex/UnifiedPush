@@ -55,7 +55,7 @@ class ServiceClient extends ServiceClientBase
             $headers[] = 'Authorization: key='.$credentials->getAuthToken();
             $headers[] = 'Content-Type: application/json';
 
-            $response = $connection->post($serviceURL, $headers, $notification['body']);
+            $response = $connection->post($serviceURL['url'], $headers, $notification['body']);
             $connection->getClient()->flush();
 
         } catch (\Exception $e) {

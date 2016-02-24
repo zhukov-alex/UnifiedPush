@@ -185,6 +185,10 @@ class GCM extends MessageBase
             'time_to_live'      => $ttl
         );
 
+        if ($this->isDryRun()) {
+            $message['dry_run'] = true;
+        }
+
         return $message;
     }
 

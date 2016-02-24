@@ -26,16 +26,16 @@ class Response
     const AUTHENTICATION_ERROR_CODE    = 401;
 
     /**
-     * @param Buzz\Message\MessageInterface $response
+     * @param \Buzz\Message\MessageInterface $response
      * @param $recipients
      */
-    public function __construct(Buzz\Message\MessageInterface $response, array $recipients)
+    public function __construct(\Buzz\Message\MessageInterface $response, array $recipients)
     {
         $statusCode = $response->getStatusCode();
         $this->checkResponseCode($statusCode);
 
         $encodedMessage = $response->getContent();
-        $message = json_decode($encodedMessage, true);
+        $message = json_decode($encodedMessage);
         $this->parseResponseMessage($message, $recipients);
     }
 
@@ -82,9 +82,9 @@ class Response
      */
     private function parseResponseMessage($message, $recipients)
     {
-        if (!$message || $message->success == 0 || $message->falure > 0) {
+        if (!$message || $message->success == 0 || $message->failure > 0) {
             throw new DispatchMessageException(
-                sprintf("%d messages could not be processed", $message->falure)
+                sprintf("%d messages could not be processed", $message->failure)
             );
         }
 
