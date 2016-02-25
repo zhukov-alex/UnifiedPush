@@ -61,16 +61,14 @@ class SocketClient
     private $streamResource;
 
     /**
-     * @param string $transport
      * @param string $target
      * @param int $targetPort
      * @param int $addressType
      */
-    public function __construct($transport, $target, $targetPort = null, $addressType = AF_INET)
+    public function __construct($target, $targetPort = null, $addressType = AF_INET)
     {
         $this
             ->setAddressType($addressType)
-            ->setTransport($transport)
             ->setTarget($target)
             ->setTargetPort($targetPort)
         ;
@@ -298,17 +296,18 @@ class SocketClient
      */
     public function addConnectionFlag($connectionFlag)
     {
-        if (in_array($connectionFlag, $this->connectionFlags)) {
-            return $this;
-        }
-
         if (!in_array($connectionFlag, array(
                 STREAM_CLIENT_CONNECT,
                 STREAM_CLIENT_PERSISTENT,
-                STREAM_CLIENT_PERSISTENT
+                STREAM_CLIENT_ASYNC_CONNECT
             )
-        ));
-        $this->connectionFlags[] = $connectionFlag;
+        )) {
+            throw new \InvalidArgumentException('Invalid connection flag argument');
+        }
+
+        if (!in_array($connectionFlag, $this->connectionFlags)) {
+            $this->connectionFlags[] = $connectionFlag;
+        }
 
         return $this;
     }

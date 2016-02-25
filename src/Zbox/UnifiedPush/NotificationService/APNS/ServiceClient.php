@@ -19,7 +19,7 @@ use Zbox\UnifiedPush\Utils\SocketClient;
  */
 class ServiceClient extends ServiceClientBase
 {
-    const SECURE_TRANSPORT_DEFAULT = 'tls';
+    const SECURE_TRANSPORT_DEFAULT = 'ssl';
 
     /**
      * Initializing socket client
@@ -30,12 +30,16 @@ class ServiceClient extends ServiceClientBase
     {
         $credentials         = $this->getCredentials();
         $url                 = $this->getServiceURL();
-        $this->serviceClient = new SocketClient(self::SECURE_TRANSPORT_DEFAULT, $url['host'], $url['port']);
+        $transport           = !empty($url['transport']) ? $url['transport'] : self::SECURE_TRANSPORT_DEFAULT;
+
+        $this->serviceClient = new SocketClient($url['host'], $url['port']);
         $this->serviceClient
+            ->setTransport($transport)
             ->setContextOptions(array(
-                    'local_cert' => $credentials->getCertificate(),
-                    'passphrase' => $credentials->getCertificatePassPhrase(),
+                'local_cert' => $credentials->getCertificate(),
+                'passphrase' => $credentials->getCertificatePassPhrase(),
             ))
+            ->addConnectionFlag(STREAM_CLIENT_PERSISTENT)
             ->setBlockingMode(false)
         ;
 
