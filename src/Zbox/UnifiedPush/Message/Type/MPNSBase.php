@@ -101,16 +101,18 @@ class MPNSBase extends MessageBase
 
         foreach ($this->getPropertiesList() as $property)
         {
-            if ($property->getValue()) {
-                $name    = "wp:" . ucfirst($property->getName());
-                $value   = $property->getValue();
+            $propertyName   = ucfirst($property->getName());
+            $getterName     = 'get' . $propertyName;
+            $value          = $this->$getterName();
 
+            if ($value) {
+                $name    = "wp:" . $propertyName;
                 $element = $message->createElement($name, $value);
                 $rootElement->appendChild($element);
             }
         }
 
-        return $message;
+        return $message->saveXML();
     }
 
     /**

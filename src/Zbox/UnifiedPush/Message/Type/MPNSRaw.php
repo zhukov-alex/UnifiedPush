@@ -63,7 +63,7 @@ class MPNSRaw extends MPNSBase
             $rootElement->appendChild($element);
         }
 
-        return $message;
+        return $message->saveXML();
     }
 
     /**

@@ -31,10 +31,10 @@ class Response
     const SERVER_UNAVAILABLE_ERROR_CODE  = 503;
 
     /**
-     * @param Buzz\Message\MessageInterface $response
+     * @param \Buzz\Message\MessageInterface $response
      * @param array $recipients
      */
-    public function __construct(Buzz\Message\MessageInterface $response, array $recipients)
+    public function __construct(\Buzz\Message\MessageInterface $response, array $recipients)
     {
         $statusCode = $response->getStatusCode();
         $this->checkResponseCode($statusCode, $recipients);

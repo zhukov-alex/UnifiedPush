@@ -217,6 +217,6 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $element = $message->createElement("userDefinedRaw", "value");
         $rootElement->appendChild($element);
 
-        return $message;
+        return $message->saveXML();
     }
 }
