@@ -25,6 +25,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider credentialsByServiceProvider
+     * @param string $service
+     * @param array $credentials
      */
     public function testGetCredentialsByService($service, $credentials)
     {
@@ -54,6 +56,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider initializedServicesProvider
+     * @param array $services
      */
     public function testGetInitializedServices($services)
     {

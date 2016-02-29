@@ -6,7 +6,6 @@ use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
 use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
 use Zbox\UnifiedPush\Message\Type\MPNSRaw as MPNSRawMessage;
 use Zbox\UnifiedPush\Exception\DomainException;
-use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,6 +15,9 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider createMessageProvider
+     * @param string $messageType
+     * @param string $deviceToken
+     * @param array $messageSample
      */
     public function testCreateMessage($messageType, $deviceToken, $messageSample)
     {
@@ -69,6 +71,9 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider validateRecipientProvider
+     * @param string $messageType
+     * @param string $token
+     * @param bool $isVaid
      */
     public function testValidateRecipient($messageType, $token, $isVaid)
     {

@@ -6,7 +6,6 @@ use Zbox\UnifiedPush\NotificationService\APNS\Credentials as APNSCredentials;
 use Zbox\UnifiedPush\NotificationService\GCM\Credentials as GCMCredentials;
 use Zbox\UnifiedPush\NotificationService\MPNS\Credentials as MPNSCredentials;
 use Zbox\UnifiedPush\Exception\DomainException;
-use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
 class CredentialsTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,6 +15,9 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider credentialsProvider
+     * @param string $serviceType
+     * @param array $credentials
+     * @param bool $isValid
      */
     public function testInitCredentials($serviceType, $credentials, $isValid)
     {
