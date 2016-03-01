@@ -59,13 +59,11 @@ class Response
                 throw new MalformedNotificationException(
                     "Notification request with a bad XML document or malformed notification URI"
                 );
-                break;
 
             case self::AUTHENTICATION_ERROR_CODE:
                 throw new DispatchMessageException(
                     "Sending this notification is unauthorized"
                 );
-                break;
 
             case self::INVALID_RECIPIENT_ERROR_CODE:
                 $recipients[0]->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
@@ -74,37 +72,31 @@ class Response
                     "The subscription is invalid and is not present on the Push Notification Service",
                     $recipients
                 );
-                break;
 
             case self::INVALID_METHOD_ERROR_CODE:
                 throw new DispatchMessageException(
                     "Invalid method. Only POST is allowed when sending a notification request"
                 );
-                break;
 
             case self::QUOTA_EXCEEDED_ERROR_CODE:
                 throw new DispatchMessageException(
                     "Unauthenticated service has reached the per-day throttling limit or there are many notifications per second"
                 );
-                break;
 
             case self::DEVICE_INACTIVE_ERROR_CODE:
                 throw new DispatchMessageException(
                     "The device is in a disconnected state"
                 );
-                break;
 
             case self::SERVER_UNAVAILABLE_ERROR_CODE:
                 throw new DispatchMessageException(
                     "The Push Notification Service is unable to process the request"
                 );
-                break;
 
             default:
                 throw new RuntimeException(
                     "Unknown error occurred while sending notification."
                 );
-                break;
         }
     }
 }

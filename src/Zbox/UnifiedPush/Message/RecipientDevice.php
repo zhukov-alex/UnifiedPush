@@ -49,7 +49,6 @@ class RecipientDevice
     /**
      * @param string $deviceIdentifier
      * @param MessageInterface $message
-     * @return $this
      */
     public function __construct($deviceIdentifier, MessageInterface $message)
     {

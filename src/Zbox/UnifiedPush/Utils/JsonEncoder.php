@@ -16,7 +16,7 @@ namespace Zbox\UnifiedPush\Utils;
 class JsonEncoder
 {
     /**
-     * @param string $data
+     * @param array $data
      * @return string
      */
     public static function jsonEncode($data)

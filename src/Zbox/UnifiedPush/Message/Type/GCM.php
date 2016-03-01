@@ -116,7 +116,7 @@ class GCM extends MessageBase
      */
     public function isDryRun()
     {
-        return $this->dryRun;
+        return (bool) $this->dryRun;
     }
 
     /**
@@ -171,7 +171,7 @@ class GCM extends MessageBase
      */
     public function createMessage($recipients)
     {
-        $ttl = $this->getExpirationTime()->format('U') - time();
+        $registrationIds = array();
 
         foreach ($recipients as $recipient) {
             $registrationIds[] = $recipient->getIdentifier();
@@ -182,12 +182,9 @@ class GCM extends MessageBase
             'delay_while_idle'  => $this->isDelayWhileIdle(),
             'registration_ids'  => $registrationIds,
             'data'              => $this->getPayloadData(),
-            'time_to_live'      => $ttl
+            'time_to_live'      => $this->getExpirationTime()->format('U') - time(),
+            'dry_run'           => $this->isDryRun()
         );
-
-        if ($this->isDryRun()) {
-            $message['dry_run'] = true;
-        }
 
         return $message;
     }

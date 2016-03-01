@@ -37,9 +37,6 @@ class ServiceClientFactory
      */
     private $config;
 
-    /**
-     * @return $this
-     */
     public function __construct()
     {
         $this->setEnvironment(self::ENVIRONMENT_PRODUCTION);

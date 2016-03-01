@@ -121,18 +121,6 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
-     * Adds a new service client connection
-     *
-     * @param ServiceClientInterface $connection
-     * @return $this
-     */
-    public function addConnection(ServiceClientInterface $connection)
-    {
-        $this->connectionPool = $connection;
-        return $this;
-    }
-
-    /**
      * Creates a feedback service connection
      *
      * @param string $serviceName

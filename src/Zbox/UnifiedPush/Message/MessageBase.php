@@ -10,8 +10,7 @@
 namespace Zbox\UnifiedPush\Message;
 
 use Zbox\UnifiedPush\Exception\BadMethodCallException,
-    Zbox\UnifiedPush\Exception\InvalidArgumentException,
-    Zbox\UnifiedPush\Exception\MalformedNotificationException;
+    Zbox\UnifiedPush\Exception\InvalidArgumentException;
 use Zbox\UnifiedPush\Utils\DateTimeHelper;
 
 /**

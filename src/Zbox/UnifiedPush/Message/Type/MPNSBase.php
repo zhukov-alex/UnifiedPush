@@ -85,7 +85,7 @@ class MPNSBase extends MessageBase
     }
 
     /**
-     * @return \DOMDocument
+     * @return string
      */
     public function createMessage()
     {

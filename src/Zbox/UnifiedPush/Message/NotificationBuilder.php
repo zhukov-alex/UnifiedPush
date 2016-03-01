@@ -63,6 +63,7 @@ class NotificationBuilder
     {
         $message        = $this->message;
         $recipientQueue = new \SplQueue();
+        $recipientChunk = array();
 
         while ($recipient = $message->getRecipient()) {
             $recipientChunk[] = $recipient;

@@ -208,7 +208,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Example MPNS raw message
-     * @return \DOMDocument
+     * @return string
      */
     public static function exampleMPNSMessage()
     {

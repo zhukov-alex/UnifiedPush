@@ -84,6 +84,7 @@ class SocketClient
     {
         $isUnix = $this->getAddressType() === AF_UNIX;
 
+        $address = array();
         $address['transport'] = $this->getTransport() . ( $isUnix ? ':///' : '://' );
         $address['target']    = $this->getTarget();
         $address['port']      = ( $isUnix ? '' : ':' ) . $this->getTargetPort();

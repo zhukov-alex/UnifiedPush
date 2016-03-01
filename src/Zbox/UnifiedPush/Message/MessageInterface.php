@@ -11,11 +11,17 @@ namespace Zbox\UnifiedPush\Message;
 
 interface MessageInterface
 {
+    public function getMessageIdentifier();
+
+    public function getMessageType();
+
     public function getPayloadMaxLength();
 
     public function getMaxRecipientsPerMessage();
 
     public function getRecipient();
+
+    public function packMessage($message, $recipients);
 
     public function validateRecipient($token);
 }

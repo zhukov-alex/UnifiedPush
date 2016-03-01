@@ -57,6 +57,7 @@ class ServiceClient extends ServiceClientBase
             $serviceURL  = $this->getServiceURL();
             $url         = str_replace('[TOKEN]', $notification['recipients'][0], $serviceURL['url']);
 
+            $headers = array();
             $headers[] = 'Accept: application/*';
             $headers[] = 'Content-Type: text/xml';
 

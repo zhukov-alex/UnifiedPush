@@ -66,13 +66,13 @@ class Application
     public function getCredentialsFilePath()
     {
         if (!file_exists($this->credentialsFilePath)) {
-            $credentialsDistFilename = sprintf('%s.dist', static::APPS_CREDENTIALS_FILENAME);
+            $credentialsFilename = sprintf('%s.dist', static::APPS_CREDENTIALS_FILENAME);
 
             throw new InvalidArgumentException(
                 sprintf(
                     "Application credentials file '%s' not exists. See example %s",
                     $this->credentialsFilePath,
-                    $credentialsDistFilename
+                    $credentialsFilename
                 )
             );
         }
@@ -193,11 +193,11 @@ class Application
      *
      * @param string $serviceName
      * @throws DomainException
-     * @return string
+     * @return array
      */
     public function getCredentialsByService($serviceName)
     {
-        if ($this->getApplicationName() && !$this->config) {
+        if ($this->getApplicationName() && empty($this->config)) {
             $this->loadApplicationConfig();
         }
 

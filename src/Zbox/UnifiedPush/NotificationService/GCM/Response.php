@@ -57,19 +57,16 @@ class Response
                 throw new MalformedNotificationException(
                     "The request could not be parsed as JSON, or it contained invalid fields"
                 );
-                break;
 
             case self::AUTHENTICATION_ERROR_CODE:
                 throw new DispatchMessageException(
                     "There was an error authenticating the sender account."
                 );
-                break;
 
             default:
                 throw new RuntimeException(
                     "Unknown error occurred while sending notification."
                 );
-                break;
         }
     }
 
@@ -90,7 +87,9 @@ class Response
 
         $hasDeviceError = false;
 
-        for ($i = 0; $i <= count($recipients); $i++) {
+        $recipientCount = count($recipients);
+
+        for ($i = 0; $i <= $recipientCount; $i++) {
             if (isset($message->results[$i]['registration_id'])) {
                 $hasDeviceError = true;
                 $recipients[$i]->setIdentifierToReplaceTo($message->results[$i]['registration_id']);
