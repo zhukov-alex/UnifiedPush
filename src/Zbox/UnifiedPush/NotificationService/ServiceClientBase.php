@@ -9,6 +9,8 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
+use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+
 /**
  * Class ServiceClientBase
  * @package Zbox\UnifiedPush\NotificationService
@@ -24,6 +26,11 @@ abstract class ServiceClientBase implements ServiceClientInterface
      * @var CredentialsInterface
      */
     protected $credentials;
+
+    /**
+     * @var array
+     */
+    protected $notification;
 
     /**
      * @var mixed
@@ -80,6 +87,28 @@ abstract class ServiceClientBase implements ServiceClientInterface
     public function getCredentials()
     {
         return $this->credentials;
+    }
+
+    /**
+     * @param array $notification
+     * @return $this
+     */
+    public function setNotification($notification)
+    {
+        $this->notification = $notification;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNotificationOrThrowException()
+    {
+        if (empty($this->notification)) {
+            throw new InvalidArgumentException('Missing notification');
+        }
+
+        return $this->notification;
     }
 
     /**

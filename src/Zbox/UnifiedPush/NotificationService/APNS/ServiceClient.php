@@ -69,12 +69,13 @@ class ServiceClient extends ServiceClientBase
      * nothing is returned. If you send a notification that is malformed
      * or otherwise unintelligible, APNs returns an error-response packet
      *
-     * @param array $notification
      * @throws ClientException
      * @return bool
      */
-    public function sendNotification($notification)
+    public function sendRequest()
     {
+        $notification = $this->getNotificationOrThrowException();
+
         try {
             $connection = $this->getClientConnection();
             $connection->write($notification['body']);
@@ -89,33 +90,5 @@ class ServiceClient extends ServiceClientBase
             new Response($errorResponseData, $notification['recipients']);
         }
         return true;
-    }
-
-    /**
-     * APN Feedback service give you information about failed push notifications
-     *
-     * @throws ClientException
-     * @return \ArrayIterator
-     */
-    public function readFeedback()
-    {
-        try {
-            $connection    = $this->getClientConnection();
-            $feedbackData  = $connection->read(-1);
-            $connection->disconnect();
-
-        } catch (\Exception $e) {
-            throw new ClientException($e->getMessage());
-        }
-
-        $invalidRecipients = new \ArrayIterator();
-
-        foreach (str_split($feedbackData, 38) as $item)
-        {
-            $deviceData = unpack('N1timestamp/n1length/H*token', $item);
-            $invalidRecipients->append($deviceData['token']);
-        }
-
-        return $invalidRecipients;
     }
 }

@@ -11,7 +11,6 @@ namespace Zbox\UnifiedPush\NotificationService\MPNS;
 
 use Zbox\UnifiedPush\NotificationService\ServiceClientBase;
 use Zbox\UnifiedPush\Exception\ClientException;
-use Zbox\UnifiedPush\Exception\BadMethodCallException;
 use Buzz\Browser;
 use Buzz\Client\MultiCurl;
 
@@ -46,12 +45,13 @@ class ServiceClient extends ServiceClientBase
     }
 
     /**
-     * @param array $notification
      * @throws ClientException
      * @return bool
      */
-    public function sendNotification($notification)
+    public function sendRequest()
     {
+        $notification = $this->getNotificationOrThrowException();
+
         try {
             $connection  = $this->getClientConnection();
             $serviceURL  = $this->getServiceURL();
@@ -75,15 +75,5 @@ class ServiceClient extends ServiceClientBase
         new Response($response, $notification['recipients']);
 
         return true;
-    }
-
-    /**
-     * No feedback service available in MPNS
-     *
-     * @throws BadMethodCallException
-     */
-    public function readFeedback()
-    {
-        throw new BadMethodCallException("No feedback service available in MPNS");
     }
 }

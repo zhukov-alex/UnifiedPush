@@ -151,7 +151,8 @@ class Dispatcher implements LoggerAwareInterface
         while ($notification = $builder->getNotification()) {
             try {
                 $connection = $this->getConnection($message->getMessageType());
-                $connection->sendNotification($notification);
+                $connection->setNotification($notification);
+                $connection->sendRequest();
 
             } catch (InvalidRecipientException $e) {
                 while ($recipient = $e->getRecipient()) {
@@ -228,7 +229,7 @@ class Dispatcher implements LoggerAwareInterface
             $this->logger->info(sprintf("Querying the feedback service '%s'", $serviceName));
 
             $connection = $this->createFeedbackConnection($serviceName);
-            $invalidRecipients = $connection->readFeedback();
+            $invalidRecipients = $connection->sendRequest();
 
             while ($invalidRecipients->valid()) {
                 $recipient = $invalidRecipients->current();

@@ -19,7 +19,8 @@ interface ServiceClientInterface
     public function setCredentials(CredentialsInterface $credentials);
     public function getCredentials();
 
-    public function sendNotification($notification);
+    public function setNotification($notification);
+    public function getNotificationOrThrowException();
 
-    public function readFeedback();
+    public function sendRequest();
 }
