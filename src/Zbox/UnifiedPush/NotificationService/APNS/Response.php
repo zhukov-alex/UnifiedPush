@@ -61,9 +61,9 @@ class Response
 
     /**
      * @param string $binaryData
-     * @param array $recipients
+     * @param \ArrayIterator $recipients
      */
-    public function __construct($binaryData, array $recipients)
+    public function __construct($binaryData, \ArrayIterator $recipients)
     {
         $this->parseResponse($binaryData, $recipients);
     }
@@ -72,9 +72,9 @@ class Response
      * Unpacks response data
      *
      * @param string $binaryData
-     * @param array $recipients
+     * @param \ArrayIterator $recipients
      */
-    public function parseResponse($binaryData, $recipients)
+    public function parseResponse($binaryData, \ArrayIterator $recipients)
     {
         $responseData = unpack("Ccommand/Cstatus/Nidentifier", $binaryData);
 
@@ -87,7 +87,8 @@ class Response
                $statusCode == self::ERROR_INVALID_TOKEN_SIZE
             || $statusCode == self::ERROR_INVALID_TOKEN
         ) {
-            $recipients[0]->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
+            $recipients->current()->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
+
             throw new InvalidRecipientException($errorDescription, $recipients);
         }
 
@@ -97,7 +98,7 @@ class Response
     /**
      * Validates response data
      *
-     * @param string $responseData
+     * @param array $responseData
      * @return $this
      */
     public function validateResponse($responseData)

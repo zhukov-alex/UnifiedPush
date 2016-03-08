@@ -99,7 +99,7 @@ abstract class MessageBase implements MessageInterface
     /**
      * @return RecipientDevice
      */
-    public function getRecipient()
+    public function getRecipientDevice()
     {
         $collection = $this->recipientCollection;
 
@@ -124,6 +124,16 @@ abstract class MessageBase implements MessageInterface
      * @return $this
      */
     public function setRecipientCollection(\ArrayIterator $collection)
+    {
+        $this->recipientCollection = $collection;
+        return $this;
+    }
+
+    /**
+     * @param \ArrayIterator $collection
+     * @return $this
+     */
+    public function addRecipientIdentifiers(\ArrayIterator $collection)
     {
         while ($collection->valid()) {
             $deviceIdentifier = $collection->current();

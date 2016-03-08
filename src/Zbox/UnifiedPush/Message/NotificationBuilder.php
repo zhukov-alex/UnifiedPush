@@ -10,7 +10,6 @@
 namespace Zbox\UnifiedPush\Message;
 
 use Zbox\UnifiedPush\Exception\MalformedNotificationException;
-use Zbox\UnifiedPush\Utils\JsonEncoder;
 
 /**
  * Class NotificationBuilder
@@ -39,7 +38,7 @@ class NotificationBuilder
     }
 
     /**
-     * @return string
+     * @return Notification|null
      */
     public function getNotification()
     {
@@ -63,23 +62,24 @@ class NotificationBuilder
     {
         $message        = $this->message;
         $recipientQueue = new \SplQueue();
-        $recipientChunk = array();
+        $recipientChunk = new \ArrayIterator();
 
-        while ($recipient = $message->getRecipient()) {
-            $recipientChunk[] = $recipient;
+        while ($recipient = $message->getRecipientDevice()) {
+            $recipientChunk->append($recipient);
 
-            if (count($recipientChunk) >= $message->getMaxRecipientsPerMessage()) {
+            if ($recipientChunk->count() >= $message->getMaxRecipientsPerMessage()) {
                 $recipientQueue->enqueue($recipientChunk);
-                $recipientChunk = [];
+                $recipientChunk = new \ArrayIterator();
             }
         }
 
-        if (!empty($recipientChunk)) {
+        if ($recipientChunk->count()) {
             $recipientQueue->enqueue($recipientChunk);
         }
 
         while (!$recipientQueue->isEmpty()) {
-            $notification = $this->buildNotification($recipientQueue->dequeue());
+            $message->setRecipientCollection($recipientQueue->dequeue());
+            $notification = $this->buildNotification();
             $this->notifications->append($notification);
         }
 
@@ -87,25 +87,25 @@ class NotificationBuilder
     }
 
     /**
-     * Returns validated and encoded message
+     * Returns created notification
      *
-     * @param array $recipients
-     * @return array
+     * @return Notification
      */
-    private function buildNotification($recipients)
+    private function buildNotification()
     {
         $message         = $this->message;
-        $messageData     = $message->createMessage($recipients);
+        $payload         = $message->createPayload();
+        $recipients      = $message->getRecipientCollection();
 
-        if (is_array($messageData)) {
-            $messageData = JsonEncoder::jsonEncode($messageData);
-        }
+        $packedPayload = $message->packPayload($payload);
+        $this->validatePayload($packedPayload);
 
-        $this->validatePayload($messageData);
-
-        $notification = $message->packMessage($messageData, $recipients);
-
-        return $notification;
+        return
+            (new Notification())
+                ->setPayload($packedPayload)
+                ->setRecipients($recipients)
+                ->setMessage($message)
+            ;
     }
 
     /**
@@ -113,9 +113,8 @@ class NotificationBuilder
      *
      * @param string $payload
      * @throws MalformedNotificationException
-     * @return $this
      */
-    public function validatePayload($payload)
+    protected function validatePayload($payload)
     {
         $message     = $this->message;
         $maxLength   = $message->getPayloadMaxLength();
@@ -130,6 +129,5 @@ class NotificationBuilder
                 )
             );
         }
-        return $this;
     }
 }

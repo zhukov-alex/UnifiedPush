@@ -31,10 +31,10 @@ class Response
     const SERVER_UNAVAILABLE_ERROR_CODE  = 503;
 
     /**
-     * @param \Buzz\Message\MessageInterface $response
-     * @param array $recipients
+     * @param \Buzz\Message\Response $response
+     * @param \ArrayIterator $recipients
      */
-    public function __construct(\Buzz\Message\MessageInterface $response, array $recipients)
+    public function __construct(\Buzz\Message\Response $response, \ArrayIterator $recipients)
     {
         $statusCode = $response->getStatusCode();
         $this->checkResponseCode($statusCode, $recipients);
@@ -44,12 +44,12 @@ class Response
      * Checks if response has succeed code or request was rejected
      *
      * @param int $responseCode
-     * @param array $recipients
+     * @param \ArrayIterator $recipients
      * @throws \Zbox\UnifiedPush\Exception\MalformedNotificationException
      * @throws \Zbox\UnifiedPush\Exception\DispatchMessageException
      * @throws \Zbox\UnifiedPush\Exception\RuntimeException
      */
-    private function checkResponseCode($responseCode, $recipients)
+    private function checkResponseCode($responseCode, \ArrayIterator $recipients)
     {
         switch ($responseCode) {
             case self::REQUEST_HAS_SUCCEED_CODE:
@@ -66,7 +66,7 @@ class Response
                 );
 
             case self::INVALID_RECIPIENT_ERROR_CODE:
-                $recipients[0]->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
+                $recipients->current()->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
 
                 throw new InvalidRecipientException(
                     "The subscription is invalid and is not present on the Push Notification Service",

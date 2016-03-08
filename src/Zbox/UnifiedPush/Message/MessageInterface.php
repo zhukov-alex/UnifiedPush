@@ -19,9 +19,19 @@ interface MessageInterface
 
     public function getMaxRecipientsPerMessage();
 
-    public function getRecipient();
+    public function getRecipientDevice();
 
-    public function packMessage($message, $recipients);
+    public function getRecipientCollection();
+
+    public function setRecipientCollection(\ArrayIterator $collection);
+
+    public function addRecipient($deviceIdentifier);
+
+    public function addRecipientIdentifiers(\ArrayIterator $collection);
+
+    public function createPayload();
+
+    public function packPayload($payload);
 
     public function validateRecipient($token);
 }

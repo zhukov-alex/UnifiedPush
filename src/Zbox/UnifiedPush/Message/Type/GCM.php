@@ -12,6 +12,7 @@ namespace Zbox\UnifiedPush\Message\Type;
 use Zbox\UnifiedPush\Message\MessageBase;
 use Zbox\UnifiedPush\NotificationService\NotificationServices;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+use Zbox\UnifiedPush\Utils\JsonEncoder;
 
 /**
  * Class GCM
@@ -166,40 +167,37 @@ class GCM extends MessageBase
     }
 
     /**
-     * @param array $recipients
      * @return array
      */
-    public function createMessage($recipients)
+    public function createPayload()
     {
         $registrationIds = array();
 
-        foreach ($recipients as $recipient) {
+        foreach ($this->getRecipientCollection() as $recipient) {
             $registrationIds[] = $recipient->getIdentifier();
         }
 
-        $message = array(
-            'collapse_key'      => $this->getCollapseKey(),
-            'delay_while_idle'  => $this->isDelayWhileIdle(),
-            'registration_ids'  => $registrationIds,
-            'data'              => $this->getPayloadData(),
-            'time_to_live'      => $this->getExpirationTime()->format('U') - time(),
-            'dry_run'           => $this->isDryRun()
-        );
+        $payload =
+            array(
+                'collapse_key'      => $this->getCollapseKey(),
+                'delay_while_idle'  => $this->isDelayWhileIdle(),
+                'registration_ids'  => $registrationIds,
+                'data'              => $this->getPayloadData(),
+                'time_to_live'      => $this->getExpirationTime()->format('U') - time()
+            );
 
-        return $message;
+        return $this->checkIfDryRun($payload);
     }
 
     /**
-     * @param string $message
-     * @param array $recipients
-     * @return array
+     * Pack message body into a json representation
+     *
+     * @param array $payload
+     * @return string
      */
-    public function packMessage($message, $recipients)
+    public function packPayload($payload)
     {
-        return array(
-            'body'       => $message,
-            'recipients' => $recipients
-        );
+        return JsonEncoder::jsonEncode($payload);
     }
 
     /**
@@ -215,5 +213,18 @@ class GCM extends MessageBase
             ));
         }
         return true;
+    }
+
+    /**
+     * @param array $payload
+     * @return array
+     */
+    protected function checkIfDryRun($payload)
+    {
+        if ($this->isDryRun()) {
+            $payload['dry_run'] = $this->isDryRun();
+        }
+
+        return $payload;
     }
 }

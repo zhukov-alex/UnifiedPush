@@ -50,20 +50,37 @@ class ServiceClient extends ServiceClientBase
         try {
             $connection  = $this->getClientConnection();
             $serviceURL  = $this->getServiceURL();
-            $credentials = $this->getCredentials();
 
-            $headers[] = 'Authorization: key='.$credentials->getAuthToken();
-            $headers[] = 'Content-Type: application/json';
+            $response =
+                $connection->post(
+                    $serviceURL['url'],
+                    $this->getHeaders(),
+                    $notification->getPayload()
+                );
 
-            $response = $connection->post($serviceURL['url'], $headers, $notification['body']);
             $connection->getClient()->flush();
 
         } catch (\Exception $e) {
             throw new ClientException($e->getMessage());
         }
 
-        new Response($response, $notification['recipients']);
+        new Response($response, $notification->getRecipients());
 
         return true;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getHeaders()
+    {
+        /** @var \Zbox\UnifiedPush\NotificationService\GCM\Credentials $credentials */
+        $credentials = $this->getCredentials();
+
+        return
+            array(
+                sprintf('Authorization: key=%s', $credentials->getAuthToken()),
+                'Content-Type: application/json'
+            );
     }
 }

@@ -20,19 +20,19 @@ class InvalidRecipientException extends DispatchMessageException
 
     /**
      * @param string $message
-     * @param array $recipients
+     * @param \ArrayIterator $recipients
      */
-    public function __construct($message, array $recipients)
+    public function __construct($message, \ArrayIterator $recipients)
     {
-        $this->recipientCollection = new \ArrayIterator($recipients);
+        $this->recipientCollection = $recipients;
 
         parent::__construct($message);
     }
 
     /**
-     * @return RecipientDevice
+     * @return \Zbox\UnifiedPush\Message\RecipientDevice
      */
-    public function getRecipient()
+    public function getRecipientDevice()
     {
         $collection = $this->recipientCollection;
 

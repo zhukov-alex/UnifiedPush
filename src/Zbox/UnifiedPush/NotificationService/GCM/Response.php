@@ -26,17 +26,34 @@ class Response
     const AUTHENTICATION_ERROR_CODE    = 401;
 
     /**
-     * @param \Buzz\Message\MessageInterface $response
-     * @param $recipients
+     * @param \Buzz\Message\Response $response
+     * @param \ArrayIterator $recipients
      */
-    public function __construct(\Buzz\Message\MessageInterface $response, array $recipients)
+    public function __construct(\Buzz\Message\Response $response, \ArrayIterator $recipients)
     {
         $statusCode = $response->getStatusCode();
         $this->checkResponseCode($statusCode);
 
         $encodedMessage = $response->getContent();
-        $message = json_decode($encodedMessage);
-        $this->parseResponseMessage($message, $recipients);
+        $message = $this->decodeMessage($encodedMessage);
+
+        $this->checkMessageStatus($message);
+        $this->checkMessageResult($message, $recipients);
+    }
+
+    /**
+     * @param string $json
+     * @return \stdClass
+     */
+    public function decodeMessage($json)
+    {
+        $message = json_decode($json);
+
+        if (is_null($message)) {
+            throw new DispatchMessageException("Message could not be decoded");
+        }
+
+        return $message;
     }
 
     /**
@@ -71,45 +88,55 @@ class Response
     }
 
     /**
-     * Parse response message
+     * Checks message status
      *
      * @param \stdClass $message
-     * @param array $recipients
-     * @return $this
      */
-    private function parseResponseMessage($message, $recipients)
+    private function checkMessageStatus($message)
     {
         if (!$message || $message->success == 0 || $message->failure > 0) {
             throw new DispatchMessageException(
                 sprintf("%d messages could not be processed", $message->failure)
             );
         }
+    }
 
+    /**
+     * Check message result
+     *
+     * @param \stdClass $message
+     * @param \ArrayIterator $recipients
+     */
+    private function checkMessageResult($message, \ArrayIterator $recipients)
+    {
         $hasDeviceError = false;
 
-        $recipientCount = count($recipients);
+        $recipientCount = $recipients->count();
 
         for ($i = 0; $i <= $recipientCount; $i++) {
             if (isset($message->results[$i]['registration_id'])) {
                 $hasDeviceError = true;
-                $recipients[$i]->setIdentifierToReplaceTo($message->results[$i]['registration_id']);
+                $recipients->offsetGet($i)->setIdentifierToReplaceTo($message->results[$i]['registration_id']);
             }
 
             if (isset($message->results[$i]['error'])) {
                 $hasDeviceError = true;
                 $error = $message->results[$i]['error'];
-                $recipients[$i] = $this->processError($error, $recipients[$i]);
+                $this->processError($error, $recipients->offsetGet($i));
             }
         }
 
         if ($hasDeviceError) {
             throw new InvalidRecipientException("Device identifier error status", $recipients);
         }
-
-        return $this;
     }
 
-    private function processError($error, $recipient)
+    /**
+     * @param string $error
+     * @param RecipientDevice $recipient
+     * @return RecipientDevice
+     */
+    private function processError($error, RecipientDevice $recipient)
     {
         switch ($error) {
             case 'InvalidRegistration':

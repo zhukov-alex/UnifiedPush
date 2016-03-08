@@ -55,25 +55,63 @@ class ServiceClient extends ServiceClientBase
         try {
             $connection  = $this->getClientConnection();
             $serviceURL  = $this->getServiceURL();
-            $url         = str_replace('[TOKEN]', $notification['recipients'][0], $serviceURL['url']);
+            $url         = str_replace('[TOKEN]', $notification->getRecipients()->current(), $serviceURL['url']);
 
-            $headers = array();
-            $headers[] = 'Accept: application/*';
-            $headers[] = 'Content-Type: text/xml';
+            $response =
+                $connection->post(
+                    $url,
+                    $this->getHeaders(),
+                    $notification->getPayload()
+                );
 
-            foreach ($notification['options'] as $key => $value) {
-                $headers[] = $key . ': ' . $value;
-            }
-
-            $response = $connection->post($url, $headers, $notification['body']);
             $connection->getClient()->flush();
 
         } catch (\Exception $e) {
             throw new ClientException($e->getMessage());
         }
 
-        new Response($response, $notification['recipients']);
+        new Response($response, $notification->getRecipients());
 
         return true;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getMPNSHeaders()
+    {
+        $notification = $this->getNotificationOrThrowException();
+
+        /** @var \Zbox\UnifiedPush\Message\Type\MPNSBase $MPNSMessage */
+        $MPNSMessage = $notification->getMessage();
+
+        return
+            array(
+                'X-MessageID'           => $MPNSMessage->getMessageIdentifier(),
+                'X-NotificationClass'   => $MPNSMessage->getDelayInterval(),
+                'X-WindowsPhone-Target' => $MPNSMessage->getMPNSType()
+            );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getHeaders()
+    {
+        $headers = array(
+            'Accept'        => 'application/*',
+            'Content-Type'  => 'text/xml'
+        );
+
+        $headers += $this->getMPNSHeaders();
+
+        return
+            array_map(
+                function ($value, $key) {
+                    return sprintf("%s: %s'", $key, $value);
+                },
+                $headers,
+                array_keys($headers)
+            );
     }
 }

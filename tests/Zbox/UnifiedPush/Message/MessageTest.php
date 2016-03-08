@@ -22,12 +22,15 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     public function testCreateMessage($messageType, $deviceToken, $messageSample)
     {
         $message         = $this->createMessageOfType($messageType);
-        $recipient       = new RecipientDevice($deviceToken, $message);
-        $registrationIds = array($recipient);
+        $recipients      = new \ArrayIterator();
+
+        $recipients->append($deviceToken);
+
+        $message->addRecipientIdentifiers($recipients);
 
         $this->assertEquals(
             $messageSample,
-            $message->createMessage($registrationIds)
+            $message->createPayload()
         );
     }
 
@@ -222,6 +225,6 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $element = $message->createElement("userDefinedRaw", "value");
         $rootElement->appendChild($element);
 
-        return $message->saveXML();
+        return $message;
     }
 }

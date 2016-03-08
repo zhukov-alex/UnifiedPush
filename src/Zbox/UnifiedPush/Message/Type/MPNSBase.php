@@ -46,6 +46,14 @@ class MPNSBase extends MessageBase
     }
 
     /**
+     * @return string
+     */
+    public function getMPNSType()
+    {
+        return static::MESSAGE_TYPE;
+    }
+
+    /**
      * No expiration time available in MPN
      *
      * @throws BadMethodCallException
@@ -85,11 +93,11 @@ class MPNSBase extends MessageBase
     }
 
     /**
-     * @return string
+     * @return \DOMDocument
      */
-    public function createMessage()
+    public function createPayload()
     {
-        $messageType = ucfirst(static::MESSAGE_TYPE);
+        $messageType = ucfirst($this->getMPNSType());
 
         $message      = new \DOMDocument("1.0", "utf-8");
         $baseElement  = $message->createElement("wp:Notification");
@@ -112,38 +120,16 @@ class MPNSBase extends MessageBase
             }
         }
 
-        return $message->saveXML();
+        return $message;
     }
 
     /**
-     * @return \ReflectionProperty[]
+     * @param \DOMDocument $payload
+     * @return string
      */
-    protected function getPropertiesList()
+    public function packPayload($payload)
     {
-        $reflection = new \ReflectionObject($this);
-        $properties = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
-
-        return $properties;
-    }
-
-    /**
-     * @param string $message
-     * @param array $recipients
-     * @return array
-     */
-    public function packMessage($message, $recipients)
-    {
-        $options = array(
-            'X-MessageID'           => $this->getMessageIdentifier(),
-            'X-NotificationClass'   => $this->getDelayInterval(),
-            'X-WindowsPhone-Target' => static::MESSAGE_TYPE
-        );
-
-        return array(
-            'body'        => $message,
-            'recipients'  => $recipients,
-            'options'     => $options
-        );
+        return $payload->saveXML();
     }
 
     /**
@@ -165,6 +151,17 @@ class MPNSBase extends MessageBase
      */
     public function __toString()
     {
-        return $this->createMessage()->saveXML();
+        return $this->createPayload()->saveXML();
+    }
+
+    /**
+     * @return \ReflectionProperty[]
+     */
+    protected function getPropertiesList()
+    {
+        $reflection = new \ReflectionObject($this);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);
+
+        return $properties;
     }
 }

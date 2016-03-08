@@ -9,6 +9,8 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
+use Zbox\UnifiedPush\Message\Notification;
+
 interface ServiceClientInterface
 {
     public function getClientConnection();
@@ -19,7 +21,7 @@ interface ServiceClientInterface
     public function setCredentials(CredentialsInterface $credentials);
     public function getCredentials();
 
-    public function setNotification($notification);
+    public function setNotification(Notification $notification);
     public function getNotificationOrThrowException();
 
     public function sendRequest();

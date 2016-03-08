@@ -48,7 +48,7 @@ class MPNSRaw extends MPNSBase
     /**
      * {@inheritdoc}
      */
-    public function createMessage()
+    public function createPayload()
     {
         $message      = new \DOMDocument("1.0", "utf-8");
         $baseElement  = $message->createElement("wp:Notification");
@@ -63,7 +63,7 @@ class MPNSRaw extends MPNSBase
             $rootElement->appendChild($element);
         }
 
-        return $message->saveXML();
+        return $message;
     }
 
     /**

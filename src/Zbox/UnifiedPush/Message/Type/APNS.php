@@ -12,6 +12,7 @@ namespace Zbox\UnifiedPush\Message\Type;
 use Zbox\UnifiedPush\Message\MessageBase;
 use Zbox\UnifiedPush\NotificationService\NotificationServices;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+use Zbox\UnifiedPush\Utils\JsonEncoder;
 
 /**
  * Class APNS
@@ -238,7 +239,7 @@ class APNS extends MessageBase
     /**
      * @return array
      */
-    public function createMessage()
+    public function createPayload()
     {
         $payload = array(
             'aps' => array(
@@ -259,27 +260,28 @@ class APNS extends MessageBase
     /**
      * Pack message body into binary string
      *
-     * @param string $message
-     * @param array $recipients
-     * @return array
+     * @param array $payload
+     * @return string
      */
-    public function packMessage($message, $recipients)
+    public function packPayload($payload)
     {
-        $recipientId  = $this->getMessageIdentifier().'_'.$recipients[0];
-        $notification =
+        $payload = JsonEncoder::jsonEncode($payload);
+
+        $recipientId = $this->getRecipientDevice()->getIdentifier();
+
+        $messageRecipientId = $this->getMessageIdentifier() . '_' . $recipientId;
+
+        $packedPayload =
             pack('C', 1). // Command push
-            pack('N', $recipientId).
+            pack('N', $messageRecipientId).
             pack('N', $this->getExpirationTime()->format('U')).
             pack('n', 32). // Token binary length
-            pack('H*', $recipients[0]);
-            pack('n', strlen($message));
+            pack('H*', $recipientId);
+        pack('n', strlen($payload));
 
-        $notification .= $message;
+        $packedPayload .= $payload;
 
-        return array(
-            'body'       => $notification,
-            'recipients' => $recipients
-        );
+        return $packedPayload;
     }
 
     /**

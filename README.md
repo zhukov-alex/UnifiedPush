@@ -60,7 +60,7 @@ $message1->addRecipient('deviceToken1');
 $message2 = new GCMMessage();
 $message2
 	->setCollapseKey('key')
-	->setRecipientCollection(
+	->addRecipientIdentifiers(
 		new ArrayIterator([
 			'deviceToken1', 
 			'deviceToken2'

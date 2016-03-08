@@ -110,8 +110,15 @@ class ServiceClientFactory
     {
         $serviceUrl = $this->getServiceURL($serviceName, $isFeedback);
 
-        $credentialsClass   = 'Zbox\UnifiedPush\NotificationService\\' . $serviceName . '\Credentials';
-        $clientClass        = 'Zbox\UnifiedPush\NotificationService\\' . $serviceName . '\ServiceClient';
+        $credentialsClass   = sprintf(
+            'Zbox\UnifiedPush\NotificationService\%s\Credentials',
+            $serviceName
+        );
+        $clientClass        = sprintf(
+            'Zbox\UnifiedPush\NotificationService\%s\%s',
+            $serviceName,
+            $isFeedback ? 'ServiceFeedbackClient' : 'ServiceClient'
+        );
 
         $credentials        = new $credentialsClass($credentials);
         $clientConnection   = new $clientClass($serviceUrl, $credentials);

@@ -155,7 +155,7 @@ class Dispatcher implements LoggerAwareInterface
                 $connection->sendRequest();
 
             } catch (InvalidRecipientException $e) {
-                while ($recipient = $e->getRecipient()) {
+                while ($recipient = $e->getRecipientDevice()) {
                     $this->application->addInvalidRecipient($message->getMessageType(), $recipient);
                 }
 

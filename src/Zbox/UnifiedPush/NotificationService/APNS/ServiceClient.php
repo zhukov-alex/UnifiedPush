@@ -28,6 +28,7 @@ class ServiceClient extends ServiceClientBase
      */
     protected function createClient()
     {
+        /** @var Credentials $credentials */
         $credentials         = $this->getCredentials();
         $url                 = $this->getServiceURL();
         $transport           = !empty($url['transport']) ? $url['transport'] : self::SECURE_TRANSPORT_DEFAULT;
@@ -78,7 +79,7 @@ class ServiceClient extends ServiceClientBase
 
         try {
             $connection = $this->getClientConnection();
-            $connection->write($notification['body']);
+            $connection->write($notification->getPayload());
 
             $errorResponseData = $connection->read(Response::ERROR_RESPONSE_LENGTH);
 
@@ -87,7 +88,7 @@ class ServiceClient extends ServiceClientBase
         }
 
         if ($errorResponseData) {
-            new Response($errorResponseData, $notification['recipients']);
+            new Response($errorResponseData, $notification->getRecipients());
         }
         return true;
     }
