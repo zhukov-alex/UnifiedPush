@@ -12,7 +12,7 @@ The recommended way to install UnifiedPush is [through composer](http://getcompo
 ```JSON
 {
     "require": {
-	    "zbox/unified-push": "dev-master"
+	    "zbox/unified-push": "^0.9"
     }
 }
 ```
