@@ -9,7 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
-use Zbox\UnifiedPush\Message\Notification;
+use Zbox\UnifiedPush\Notification\Notification;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
 /**

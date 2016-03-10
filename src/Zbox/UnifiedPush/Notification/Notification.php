@@ -7,11 +7,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Zbox\UnifiedPush\Message;
+namespace Zbox\UnifiedPush\Notification;
+
+use Zbox\UnifiedPush\Message\MessageInterface;
 
 /**
  * Class Notification
- * @package Zbox\UnifiedPush\Message
+ * @package Zbox\UnifiedPush\Notification
  */
 class Notification
 {

@@ -7,13 +7,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Zbox\UnifiedPush\Message;
+namespace Zbox\UnifiedPush\Notification;
 
+use Zbox\UnifiedPush\Message\MessageInterface;
 use Zbox\UnifiedPush\Exception\MalformedNotificationException;
 
 /**
  * Class NotificationBuilder
- * @package Zbox\UnifiedPush\Message
+ * @package Zbox\UnifiedPush\Notification
  */
 class NotificationBuilder
 {

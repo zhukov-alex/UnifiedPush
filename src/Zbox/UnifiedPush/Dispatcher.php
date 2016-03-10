@@ -10,7 +10,7 @@
 namespace Zbox\UnifiedPush;
 
 use Zbox\UnifiedPush\Message\MessageInterface,
-    Zbox\UnifiedPush\Message\NotificationBuilder;
+    Zbox\UnifiedPush\Notification\NotificationBuilder;
 use Zbox\UnifiedPush\NotificationService\NotificationServices,
     Zbox\UnifiedPush\NotificationService\ServiceClientInterface,
     Zbox\UnifiedPush\NotificationService\ServiceClientFactory;
