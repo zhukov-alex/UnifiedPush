@@ -9,8 +9,6 @@
 
 namespace Zbox\UnifiedPush\Notification;
 
-use Zbox\UnifiedPush\Message\MessageInterface;
-
 /**
  * Class Notification
  * @package Zbox\UnifiedPush\Notification
@@ -28,9 +26,11 @@ class Notification
     protected $recipients;
 
     /**
-     * @var MessageInterface
+     * Custom properties
+     *
+     * @var array
      */
-    protected $message;
+    private $customNotificationData = array();
 
     /**
      * @return string
@@ -62,27 +62,27 @@ class Notification
      * @param \ArrayIterator $recipients
      * @return $this
      */
-    public function setRecipients($recipients)
+    public function setRecipients(\ArrayIterator $recipients)
     {
         $this->recipients = $recipients;
         return $this;
     }
 
     /**
-     * @return MessageInterface
+     * @return array
      */
-    public function getMessage()
+    public function getCustomNotificationData()
     {
-        return $this->message;
+        return $this->customNotificationData;
     }
 
     /**
-     * @param MessageInterface $message
+     * @param array $customNotificationData
      * @return $this
      */
-    public function setMessage(MessageInterface $message)
+    public function setCustomNotificationData($customNotificationData)
     {
-        $this->message = $message;
+        $this->customNotificationData = $customNotificationData;
         return $this;
     }
 }

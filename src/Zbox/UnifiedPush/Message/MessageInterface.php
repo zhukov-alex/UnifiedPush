@@ -15,23 +15,15 @@ interface MessageInterface
 
     public function getMessageType();
 
-    public function getPayloadMaxLength();
-
     public function getMaxRecipientsPerMessage();
 
-    public function getRecipientDevice();
+    public function getRecipientDeviceCollection();
 
-    public function getRecipientCollection();
-
-    public function setRecipientCollection(\ArrayIterator $collection);
+    public function setRecipientDeviceCollection(\ArrayIterator $collection);
 
     public function addRecipient($deviceIdentifier);
 
     public function addRecipientIdentifiers(\ArrayIterator $collection);
-
-    public function createPayload();
-
-    public function packPayload($payload);
 
     public function validateRecipient($token);
 }

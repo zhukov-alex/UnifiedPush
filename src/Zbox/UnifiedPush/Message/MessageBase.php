@@ -40,7 +40,6 @@ abstract class MessageBase implements MessageInterface
      */
     protected $messageIdentifier;
 
-
     /**
      * Collection of recipient devices
      *
@@ -77,44 +76,9 @@ abstract class MessageBase implements MessageInterface
     abstract public function validateRecipient($token);
 
     /**
-     * Gets number of recipients allowed for single notification
-     *
-     * @return int
-     */
-    public function getMaxRecipientsPerMessage()
-    {
-        return static::MAX_RECIPIENTS_PER_MESSAGE_COUNT;
-    }
-
-    /**
-     * Gets maximum size allowed for notification payload
-     *
-     * @return int
-     */
-    public function getPayloadMaxLength()
-    {
-        return static::PAYLOAD_MAX_LENGTH;
-    }
-
-    /**
-     * @return RecipientDevice
-     */
-    public function getRecipientDevice()
-    {
-        $collection = $this->recipientCollection;
-
-        if ($collection->valid()) {
-            $device = $collection->current();
-            $collection->next();
-            return $device;
-        }
-        return null;
-    }
-
-    /**
      * @return \ArrayIterator
      */
-    public function getRecipientCollection()
+    public function getRecipientDeviceCollection()
     {
         return $this->recipientCollection;
     }
@@ -123,9 +87,10 @@ abstract class MessageBase implements MessageInterface
      * @param \ArrayIterator $collection
      * @return $this
      */
-    public function setRecipientCollection(\ArrayIterator $collection)
+    public function setRecipientDeviceCollection(\ArrayIterator $collection)
     {
         $this->recipientCollection = $collection;
+
         return $this;
     }
 
@@ -154,6 +119,16 @@ abstract class MessageBase implements MessageInterface
         $this->recipientCollection->append($device);
 
         return $this;
+    }
+
+    /**
+     * Gets number of recipients allowed for single notification
+     *
+     * @return int
+     */
+    public function getMaxRecipientsPerMessage()
+    {
+        return static::MAX_RECIPIENTS_PER_MESSAGE_COUNT;
     }
 
     /**

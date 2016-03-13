@@ -21,11 +21,6 @@ use Zbox\UnifiedPush\Exception\BadMethodCallException;
 class MPNSBase extends MessageBase
 {
     /**
-     * The maximum size allowed for MPNS message payload is 3K bytes
-     */
-    const PAYLOAD_MAX_LENGTH = 3072;
-
-    /**
      * MPNs does not support multicast sending
      */
     const MAX_RECIPIENTS_PER_MESSAGE_COUNT = 1;
@@ -93,46 +88,6 @@ class MPNSBase extends MessageBase
     }
 
     /**
-     * @return \DOMDocument
-     */
-    public function createPayload()
-    {
-        $messageType = ucfirst($this->getMPNSType());
-
-        $message      = new \DOMDocument("1.0", "utf-8");
-        $baseElement  = $message->createElement("wp:Notification");
-        $baseElement->setAttribute("xmlns:wp", "WPNotification");
-        $message->appendChild($baseElement);
-
-        $rootElement = $message->createElement("wp:" . $messageType);
-        $baseElement->appendChild($rootElement);
-
-        foreach ($this->getPropertiesList() as $property)
-        {
-            $propertyName   = ucfirst($property->getName());
-            $getterName     = 'get' . $propertyName;
-            $value          = $this->$getterName();
-
-            if ($value) {
-                $name    = "wp:" . $propertyName;
-                $element = $message->createElement($name, $value);
-                $rootElement->appendChild($element);
-            }
-        }
-
-        return $message;
-    }
-
-    /**
-     * @param \DOMDocument $payload
-     * @return string
-     */
-    public function packPayload($payload)
-    {
-        return $payload->saveXML();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function validateRecipient($token)
@@ -147,17 +102,9 @@ class MPNSBase extends MessageBase
     }
 
     /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->createPayload()->saveXML();
-    }
-
-    /**
      * @return \ReflectionProperty[]
      */
-    protected function getPropertiesList()
+    public function getPropertiesList()
     {
         $reflection = new \ReflectionObject($this);
         $properties = $reflection->getProperties(\ReflectionProperty::IS_PRIVATE);

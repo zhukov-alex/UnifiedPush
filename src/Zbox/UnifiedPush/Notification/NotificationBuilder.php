@@ -10,6 +10,7 @@
 namespace Zbox\UnifiedPush\Notification;
 
 use Zbox\UnifiedPush\Message\MessageInterface;
+use Zbox\UnifiedPush\NotificationService\NotificationServices;
 use Zbox\UnifiedPush\Exception\MalformedNotificationException;
 
 /**
@@ -18,6 +19,11 @@ use Zbox\UnifiedPush\Exception\MalformedNotificationException;
  */
 class NotificationBuilder
 {
+    /**
+     * @var
+     */
+    private $payloadHandler;
+
     /**
      * @var MessageInterface
      */
@@ -29,13 +35,19 @@ class NotificationBuilder
     private $notifications;
 
     /**
-     * @param MessageInterface $message
+     * @param string $type
+     * @return PayloadHandlerInterface
      */
-    public function __construct(MessageInterface $message)
+    public function getHandlerByService($type)
     {
-        $this->notifications = new \ArrayIterator();
-        $this->message = $message;
-        $this->buildNotifications();
+        NotificationServices::validateServiceName($type);
+
+        if (empty($this->payloadHandler[$type])) {
+            $handlerClass = sprintf('\Zbox\UnifiedPush\Notification\PayloadHandler\%s', $type);
+            $this->payloadHandler[$type] = new $handlerClass();
+        }
+
+        return $this->payloadHandler[$type];
     }
 
     /**
@@ -57,15 +69,17 @@ class NotificationBuilder
      * Generates number of notifications by message recipient count
      * and notification service limitations
      *
+     * @param MessageInterface $message
      * @return $this
      */
-    public function buildNotifications()
+    public function buildNotifications(MessageInterface $message)
     {
-        $message        = $this->message;
+        $this->message  = $message;
+
         $recipientQueue = new \SplQueue();
         $recipientChunk = new \ArrayIterator();
 
-        while ($recipient = $message->getRecipientDevice()) {
+        foreach ($message->getRecipientDeviceCollection() as $recipient) {
             $recipientChunk->append($recipient);
 
             if ($recipientChunk->count() >= $message->getMaxRecipientsPerMessage()) {
@@ -79,8 +93,7 @@ class NotificationBuilder
         }
 
         while (!$recipientQueue->isEmpty()) {
-            $message->setRecipientCollection($recipientQueue->dequeue());
-            $notification = $this->buildNotification();
+            $notification = $this->createNotification($recipientQueue->dequeue());
             $this->notifications->append($notification);
         }
 
@@ -90,22 +103,29 @@ class NotificationBuilder
     /**
      * Returns created notification
      *
+     * @param \ArrayIterator $recipients
      * @return Notification
+     * @throws MalformedNotificationException
      */
-    private function buildNotification()
+    private function createNotification(\ArrayIterator $recipients)
     {
-        $message         = $this->message;
-        $payload         = $message->createPayload();
-        $recipients      = $message->getRecipientCollection();
+        $message        = clone $this->message;
+        $message->setRecipientDeviceCollection($recipients);
 
-        $packedPayload = $message->packPayload($payload);
+        $payloadHandler = $this->getHandlerByService($message->getMessageType());
+        $payloadHandler->setMessage($message);
+
+        $payload        = $payloadHandler->createPayload();
+        $packedPayload  = $payloadHandler->packPayload($payload);
+        $customData     = $payloadHandler->getCustomNotificationData();
+
         $this->validatePayload($packedPayload);
 
         return
             (new Notification())
-                ->setPayload($packedPayload)
                 ->setRecipients($recipients)
-                ->setMessage($message)
+                ->setPayload($packedPayload)
+                ->setCustomNotificationData($customData)
             ;
     }
 
@@ -115,11 +135,13 @@ class NotificationBuilder
      * @param string $payload
      * @throws MalformedNotificationException
      */
-    protected function validatePayload($payload)
+    private function validatePayload($payload)
     {
         $message     = $this->message;
-        $maxLength   = $message->getPayloadMaxLength();
         $messageType = $message->getMessageType();
+
+        $payloadHandler = $this->getHandlerByService($messageType);
+        $maxLength      = $payloadHandler->getPayloadMaxLength();
 
         if (strlen($payload) > $maxLength) {
             throw new MalformedNotificationException(

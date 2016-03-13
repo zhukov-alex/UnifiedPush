@@ -2,6 +2,7 @@
 
 namespace Zbox\UnifiedPush\Message;
 
+use Zbox\UnifiedPush\Notification\PayloadHandlerInterface;
 use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
 use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
 use Zbox\UnifiedPush\Message\Type\MPNSRaw as MPNSRawMessage;
@@ -30,7 +31,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $messageSample,
-            $message->createPayload()
+            $this
+                ->getPayloadHandlerByType($messageType)
+                ->setMessage($message)
+                ->createPayload()
         );
     }
 
@@ -226,5 +230,16 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $rootElement->appendChild($element);
 
         return $message;
+    }
+
+    /**
+     * @param string $type
+     * @return PayloadHandlerInterface
+     */
+    private function getPayloadHandlerByType($type)
+    {
+        $handlerClass = sprintf('\Zbox\UnifiedPush\Notification\PayloadHandler\%s', $type);
+
+        return new $handlerClass;
     }
 }

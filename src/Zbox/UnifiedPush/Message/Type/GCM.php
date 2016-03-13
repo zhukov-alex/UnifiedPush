@@ -12,7 +12,6 @@ namespace Zbox\UnifiedPush\Message\Type;
 use Zbox\UnifiedPush\Message\MessageBase;
 use Zbox\UnifiedPush\NotificationService\NotificationServices;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
-use Zbox\UnifiedPush\Utils\JsonEncoder;
 
 /**
  * Class GCM
@@ -20,11 +19,6 @@ use Zbox\UnifiedPush\Utils\JsonEncoder;
  */
 class GCM extends MessageBase
 {
-    /**
-     * The maximum size allowed for an Android notification payload is 4096 bytes
-     */
-    const PAYLOAD_MAX_LENGTH = 4096;
-
     /**
      * It`s possible to send the same message to up to 1000 registration IDs in one request
      */
@@ -167,40 +161,6 @@ class GCM extends MessageBase
     }
 
     /**
-     * @return array
-     */
-    public function createPayload()
-    {
-        $registrationIds = array();
-
-        foreach ($this->getRecipientCollection() as $recipient) {
-            $registrationIds[] = $recipient->getIdentifier();
-        }
-
-        $payload =
-            array(
-                'collapse_key'      => $this->getCollapseKey(),
-                'delay_while_idle'  => $this->isDelayWhileIdle(),
-                'registration_ids'  => $registrationIds,
-                'data'              => $this->getPayloadData(),
-                'time_to_live'      => $this->getExpirationTime()->format('U') - time()
-            );
-
-        return $this->checkIfDryRun($payload);
-    }
-
-    /**
-     * Pack message body into a json representation
-     *
-     * @param array $payload
-     * @return string
-     */
-    public function packPayload($payload)
-    {
-        return JsonEncoder::jsonEncode($payload);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function validateRecipient($token)
@@ -213,18 +173,5 @@ class GCM extends MessageBase
             ));
         }
         return true;
-    }
-
-    /**
-     * @param array $payload
-     * @return array
-     */
-    protected function checkIfDryRun($payload)
-    {
-        if ($this->isDryRun()) {
-            $payload['dry_run'] = $this->isDryRun();
-        }
-
-        return $payload;
     }
 }

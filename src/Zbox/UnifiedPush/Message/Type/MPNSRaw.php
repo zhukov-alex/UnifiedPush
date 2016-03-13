@@ -46,27 +46,6 @@ class MPNSRaw extends MPNSBase
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function createPayload()
-    {
-        $message      = new \DOMDocument("1.0", "utf-8");
-        $baseElement  = $message->createElement("wp:Notification");
-        $baseElement->setAttribute("xmlns:wp", "WPNotification");
-        $message->appendChild($baseElement);
-
-        $rootElement = $message->createElement("root");
-        $baseElement->appendChild($rootElement);
-
-        foreach ($this->_payload as $key => $value) {
-            $element = $message->createElement($key, $value);
-            $rootElement->appendChild($element);
-        }
-
-        return $message;
-    }
-
-    /**
      * @param string $name
      */
     public function __get($name)
@@ -85,5 +64,13 @@ class MPNSRaw extends MPNSBase
     public function __set($name, $value)
     {
         $this->_payload[$name] = htmlspecialchars($value);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRawPayload()
+    {
+        return $this->_payload;
     }
 }

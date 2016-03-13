@@ -12,7 +12,6 @@ namespace Zbox\UnifiedPush\Message\Type;
 use Zbox\UnifiedPush\Message\MessageBase;
 use Zbox\UnifiedPush\NotificationService\NotificationServices;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
-use Zbox\UnifiedPush\Utils\JsonEncoder;
 
 /**
  * Class APNS
@@ -20,12 +19,6 @@ use Zbox\UnifiedPush\Utils\JsonEncoder;
  */
 class APNS extends MessageBase
 {
-    /**
-     * The maximum size allowed for an iOS notification payload is 2 kilobytes
-     * Prior to iOS 8 and in OS X, the maximum payload size is 256 bytes
-     */
-    const PAYLOAD_MAX_LENGTH = 2048;
-
     /**
      * APNs does not support multicast sending
      */
@@ -234,54 +227,6 @@ class APNS extends MessageBase
         $this->category = $category;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function createPayload()
-    {
-        $payload = array(
-            'aps' => array(
-                'alert' => $this->getAlert(),
-                'badge' => $this->getBadge(),
-                'sound' => $this->getSound(),
-                'category' => $this->getCategory(),
-            )
-        );
-
-        if ($this->isContentAvailable() === true) {
-            $payload['aps']['content-available'] = 1;
-        }
-
-        return array_merge($payload, $this->getCustomPayloadData());
-    }
-
-    /**
-     * Pack message body into binary string
-     *
-     * @param array $payload
-     * @return string
-     */
-    public function packPayload($payload)
-    {
-        $payload = JsonEncoder::jsonEncode($payload);
-
-        $recipientId = $this->getRecipientDevice()->getIdentifier();
-
-        $messageRecipientId = $this->getMessageIdentifier() . '_' . $recipientId;
-
-        $packedPayload =
-            pack('C', 1). // Command push
-            pack('N', $messageRecipientId).
-            pack('N', $this->getExpirationTime()->format('U')).
-            pack('n', 32). // Token binary length
-            pack('H*', $recipientId);
-        pack('n', strlen($payload));
-
-        $packedPayload .= $payload;
-
-        return $packedPayload;
     }
 
     /**

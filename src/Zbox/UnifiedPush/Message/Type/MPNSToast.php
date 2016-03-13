@@ -9,9 +9,6 @@
 
 namespace Zbox\UnifiedPush\Message\Type;
 
-use Zbox\UnifiedPush\Exception\InvalidArgumentException;
-use Zbox\UnifiedPush\NotificationService\NotificationServices;
-
 /**
  * Class MPNSToast
  * @package Zbox\UnifiedPush\Message\Type

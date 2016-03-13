@@ -82,14 +82,13 @@ class ServiceClient extends ServiceClientBase
     {
         $notification = $this->getNotificationOrThrowException();
 
-        /** @var \Zbox\UnifiedPush\Message\Type\MPNSBase $MPNSMessage */
-        $MPNSMessage = $notification->getMessage();
+        $customNotification = $notification->getCustomNotificationData();
 
         return
             array(
-                'X-MessageID'           => $MPNSMessage->getMessageIdentifier(),
-                'X-NotificationClass'   => $MPNSMessage->getDelayInterval(),
-                'X-WindowsPhone-Target' => $MPNSMessage->getMPNSType()
+                'X-MessageID'           => $customNotification['message_id'],
+                'X-NotificationClass'   => $customNotification['delay_interval'],
+                'X-WindowsPhone-Target' => $customNotification['message_type']
             );
     }
 

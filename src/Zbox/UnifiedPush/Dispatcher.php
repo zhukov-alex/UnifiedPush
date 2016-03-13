@@ -35,6 +35,11 @@ class Dispatcher implements LoggerAwareInterface
     private $application;
 
     /**
+     * @var NotificationBuilder
+     */
+    private $notificationBuilder;
+
+    /**
      * @var array
      */
     private $connectionPool;
@@ -51,12 +56,19 @@ class Dispatcher implements LoggerAwareInterface
 
     /**
      * @param Application $application
+     * @param ServiceClientFactory $clientFactory
+     * @param NotificationBuilder $notificationBuilder
      */
-    public function __construct(Application $application)
-    {
-        $this->setLogger(new NullLogger());
+    public function __construct(
+        Application $application,
+        ServiceClientFactory $clientFactory,
+        NotificationBuilder $notificationBuilder
+    ){
         $this->application    = $application;
-        $this->clientFactory  = new ServiceClientFactory();
+        $this->clientFactory  = $clientFactory;
+        $this->notificationBuilder = $notificationBuilder;
+
+        $this->setLogger(new NullLogger());
     }
 
     /**
@@ -146,7 +158,10 @@ class Dispatcher implements LoggerAwareInterface
         $this->logger->info(
             sprintf("Sending message id '%s'", $message->getMessageIdentifier())
         );
-        $builder = new NotificationBuilder($message);
+
+        $builder = $this->notificationBuilder;
+
+        $builder->buildNotifications($message);
 
         while ($notification = $builder->getNotification()) {
             try {
