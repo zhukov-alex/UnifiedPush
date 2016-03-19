@@ -83,7 +83,15 @@ Initialize dispatcher, then set environment and try to send message queue, then 
 ```php
 <?php
 
-$dispatcher = new Zbox\UnifiedPush\Dispatcher($application, new ServiceClientFactory(), new NotificationBuilder());
+use Zbox\UnifiedPush\NotificationService\ServiceClientFactory;
+use Zbox\UnifiedPush\Notification\NotificationBuilder;
+
+$dispatcher = 
+    new Zbox\UnifiedPush\Dispatcher(
+        $application,
+        new ServiceClientFactory(),
+        new NotificationBuilder()
+    );
 
 $dispatcher->setDevelopmentMode(true);
 
