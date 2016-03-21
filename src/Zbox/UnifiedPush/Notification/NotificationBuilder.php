@@ -10,8 +10,8 @@
 namespace Zbox\UnifiedPush\Notification;
 
 use Zbox\UnifiedPush\Message\MessageInterface;
-use Zbox\UnifiedPush\NotificationService\NotificationServices;
 use Zbox\UnifiedPush\Exception\MalformedNotificationException;
+use Zbox\UnifiedPush\Exception\DomainException;
 
 /**
  * Class NotificationBuilder
@@ -20,9 +20,9 @@ use Zbox\UnifiedPush\Exception\MalformedNotificationException;
 class NotificationBuilder
 {
     /**
-     * @var
+     * @var PayloadHandlerInterface[]
      */
-    private $payloadHandler;
+    private $payloadHandlers;
 
     /**
      * @var MessageInterface
@@ -35,19 +35,18 @@ class NotificationBuilder
     private $notifications;
 
     /**
-     * @param string $type
-     * @return PayloadHandlerInterface
+     * @param PayloadHandlerInterface $handler
+     * @return $this
      */
-    public function getHandlerByService($type)
+    public function addPayloadHandler(PayloadHandlerInterface $handler)
     {
-        NotificationServices::validateServiceName($type);
+        $hash = spl_object_hash($handler);
 
-        if (empty($this->payloadHandler[$type])) {
-            $handlerClass = sprintf('\Zbox\UnifiedPush\Notification\PayloadHandler\%s', $type);
-            $this->payloadHandler[$type] = new $handlerClass();
+        if (!isset($this->payloadHandlers[$hash])) {
+            $this->payloadHandlers[$hash] = $handler;
         }
 
-        return $this->payloadHandler[$type];
+        return $this;
     }
 
     /**
@@ -74,7 +73,8 @@ class NotificationBuilder
      */
     public function buildNotifications(MessageInterface $message)
     {
-        $this->message  = $message;
+        $this->message        = $message;
+        $this->notifications  = new \ArrayIterator();
 
         $recipientQueue = new \SplQueue();
         $recipientChunk = new \ArrayIterator();
@@ -109,39 +109,62 @@ class NotificationBuilder
      */
     private function createNotification(\ArrayIterator $recipients)
     {
-        $message        = clone $this->message;
+        $message = clone $this->message;
         $message->setRecipientDeviceCollection($recipients);
 
-        $payloadHandler = $this->getHandlerByService($message->getMessageType());
-        $payloadHandler->setMessage($message);
+        foreach ($this->payloadHandlers as $handler) {
+            if ($handler->isSupported($message)) {
+                $packedPayload  = $this->handlePayload($handler, $message);
+                $customData     = $handler->getCustomNotificationData();
 
-        $payload        = $payloadHandler->createPayload();
-        $packedPayload  = $payloadHandler->packPayload($payload);
-        $customData     = $payloadHandler->getCustomNotificationData();
+                return
+                    (new Notification())
+                        ->setRecipients($recipients)
+                        ->setPayload($packedPayload)
+                        ->setCustomNotificationData($customData)
+                    ;
+            }
+        }
 
-        $this->validatePayload($packedPayload);
+        throw new DomainException(
+            sprintf(
+                'Unhandled message type %s',
+                $message->getMessageType()
+            )
+        );
+    }
 
-        return
-            (new Notification())
-                ->setRecipients($recipients)
-                ->setPayload($packedPayload)
-                ->setCustomNotificationData($customData)
-            ;
+    /**
+     * @param PayloadHandlerInterface $handler
+     * @param MessageInterface $message
+     * @return string
+     * @throws MalformedNotificationException
+     */
+    private function handlePayload(PayloadHandlerInterface $handler, MessageInterface $message)
+    {
+        $handler->setMessage($message);
+
+        $payload = $handler->createPayload();
+        $packedPayload = $handler->packPayload($payload);
+
+        $this->validatePayload($handler, $packedPayload);
+
+        return $packedPayload;
     }
 
     /**
      * Check if maximum size allowed for a notification payload exceeded
      *
+     * @param PayloadHandlerInterface $handler
      * @param string $payload
      * @throws MalformedNotificationException
      */
-    private function validatePayload($payload)
+    private function validatePayload(PayloadHandlerInterface $handler, $payload)
     {
         $message     = $this->message;
         $messageType = $message->getMessageType();
 
-        $payloadHandler = $this->getHandlerByService($messageType);
-        $maxLength      = $payloadHandler->getPayloadMaxLength();
+        $maxLength   = $handler->getPayloadMaxLength();
 
         if (strlen($payload) > $maxLength) {
             throw new MalformedNotificationException(
