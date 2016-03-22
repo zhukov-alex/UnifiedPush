@@ -73,8 +73,7 @@ class NotificationBuilder
      */
     public function buildNotifications(MessageInterface $message)
     {
-        $this->message        = $message;
-        $this->notifications  = new \ArrayIterator();
+        $this->message  = $message;
 
         $recipientQueue = new \SplQueue();
         $recipientChunk = new \ArrayIterator();
@@ -119,6 +118,7 @@ class NotificationBuilder
 
                 return
                     (new Notification())
+                        ->setType($message->getMessageType())
                         ->setRecipients($recipients)
                         ->setPayload($packedPayload)
                         ->setCustomNotificationData($customData)

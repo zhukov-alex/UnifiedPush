@@ -9,12 +9,19 @@
 
 namespace Zbox\UnifiedPush\Notification;
 
+use Zbox\UnifiedPush\NotificationService\NotificationServices;
+
 /**
  * Class Notification
  * @package Zbox\UnifiedPush\Notification
  */
 class Notification
 {
+    /**
+     * @var string
+     */
+    protected $type;
+
     /**
      * @var string
      */
@@ -31,6 +38,24 @@ class Notification
      * @var array
      */
     private $customNotificationData = array();
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = NotificationServices::validateServiceName($type);
+        return $this;
+    }
 
     /**
      * @return string

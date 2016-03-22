@@ -147,31 +147,22 @@ class Dispatcher implements LoggerAwareInterface
     /**
      * Tries to connect and send a message to notification service
      *
-     * @param MessageInterface $message
      * @return bool
      * @throws Zbox\UnifiedPush\Exception\InvalidRecipientException
      * @throws Zbox\UnifiedPush\Exception\DispatchMessageException
      * @throws Zbox\UnifiedPush\Exception\MalformedNotificationException
      */
-    private function sendMessage(MessageInterface $message)
+    private function sendNotifications()
     {
-        $this->logger->info(
-            sprintf("Sending message id '%s'", $message->getMessageIdentifier())
-        );
-
-        $builder = $this->notificationBuilder;
-
-        $builder->buildNotifications($message);
-
-        while ($notification = $builder->getNotification()) {
+        while ($notification = $this->notificationBuilder->getNotification()) {
             try {
-                $connection = $this->getConnection($message->getMessageType());
+                $connection = $this->getConnection($notification->getType());
                 $connection->setNotification($notification);
                 $connection->sendRequest();
 
             } catch (InvalidRecipientException $e) {
                 while ($recipient = $e->getRecipientDevice()) {
-                    $this->application->addInvalidRecipient($message->getMessageType(), $recipient);
+                    $this->application->addInvalidRecipient($notification->getType(), $recipient);
                 }
 
             } catch (DispatchMessageException $e) {
@@ -204,11 +195,14 @@ class Dispatcher implements LoggerAwareInterface
         try {
             while ($messages->valid()) {
                 $message = $messages->current();
-                if ($this->sendMessage($message)) {
+                if ($this->notificationBuilder->buildNotifications($message)) {
                     $messages->offsetUnset($message->getMessageIdentifier());
                 }
                 $messages->next();
             }
+
+            $this->sendNotifications();
+
         } catch (ClientException $e) {
             $this->logger->error(
                 sprintf("Client connection error: %s", $e->getMessage())
