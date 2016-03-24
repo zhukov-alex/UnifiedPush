@@ -9,11 +9,11 @@
 
 namespace Zbox\UnifiedPush;
 
-use Zbox\UnifiedPush\Message\MessageInterface,
-    Zbox\UnifiedPush\Notification\NotificationBuilder;
+use Zbox\UnifiedPush\Notification\NotificationBuilder;
 use Zbox\UnifiedPush\NotificationService\NotificationServices,
     Zbox\UnifiedPush\NotificationService\ServiceClientInterface,
-    Zbox\UnifiedPush\NotificationService\ServiceClientFactory;
+    Zbox\UnifiedPush\NotificationService\ServiceClientFactory,
+    Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\Exception\InvalidRecipientException,
     Zbox\UnifiedPush\Exception\DispatchMessageException,
     Zbox\UnifiedPush\Exception\MalformedNotificationException,
@@ -48,6 +48,11 @@ class Dispatcher implements LoggerAwareInterface
      * @var ServiceClientFactory
      */
     private $clientFactory;
+
+    /**
+     * @var \ArrayIterator
+     */
+    private $responseCollection;
 
     /**
      * @var LoggerInterface
@@ -133,51 +138,14 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
-     * Creates a feedback service connection
-     *
-     * @param string $serviceName
-     * @return ServiceClientInterface
+     * @param ResponseInterface $response
+     * @return $this
      */
-    private function createFeedbackConnection($serviceName)
+    public function addResponse(ResponseInterface $response)
     {
-        $credentials  = $this->getServiceCredentials($serviceName);
-        return $this->clientFactory->createServiceClient($serviceName, $credentials, true);
-    }
+        $this->responseCollection->append($response);
 
-    /**
-     * Tries to connect and send a message to notification service
-     *
-     * @return bool
-     * @throws Zbox\UnifiedPush\Exception\InvalidRecipientException
-     * @throws Zbox\UnifiedPush\Exception\DispatchMessageException
-     * @throws Zbox\UnifiedPush\Exception\MalformedNotificationException
-     */
-    private function sendNotifications()
-    {
-        while ($notification = $this->notificationBuilder->getNotification()) {
-            try {
-                $connection = $this->getConnection($notification->getType());
-                $connection->setNotification($notification);
-                $connection->sendRequest();
-
-            } catch (InvalidRecipientException $e) {
-                while ($recipient = $e->getRecipientDevice()) {
-                    $this->application->addInvalidRecipient($notification->getType(), $recipient);
-                }
-
-            } catch (DispatchMessageException $e) {
-                $this->logger->warning(
-                    sprintf("Dispatch message warning with code %d  '%s'", $e->getCode(), $e->getMessage())
-                );
-
-            } catch (MalformedNotificationException $e) {
-                $this->logger->error(
-                    sprintf("Malformed Notification error: %s", $e->getMessage())
-                );
-                return false;
-            }
-        }
-        return true;
+        return $this;
     }
 
     /**
@@ -238,7 +206,11 @@ class Dispatcher implements LoggerAwareInterface
             $this->logger->info(sprintf("Querying the feedback service '%s'", $serviceName));
 
             $connection = $this->createFeedbackConnection($serviceName);
-            $invalidRecipients = $connection->sendRequest();
+            $response = $connection->sendRequest();
+            $response->processResponse();
+
+            /** @var \ArrayIterator $invalidRecipients */
+            $invalidRecipients = $response->getRecipients();
 
             while ($invalidRecipients->valid()) {
                 $recipient = $invalidRecipients->current();
@@ -258,5 +230,56 @@ class Dispatcher implements LoggerAwareInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Creates a feedback service connection
+     *
+     * @param string $serviceName
+     * @return ServiceClientInterface
+     */
+    private function createFeedbackConnection($serviceName)
+    {
+        $credentials  = $this->getServiceCredentials($serviceName);
+        return $this->clientFactory->createServiceClient($serviceName, $credentials, true);
+    }
+
+    /**
+     * Tries to connect and send a message to notification service
+     *
+     * @return bool
+     * @throws Zbox\UnifiedPush\Exception\InvalidRecipientException
+     * @throws Zbox\UnifiedPush\Exception\DispatchMessageException
+     * @throws Zbox\UnifiedPush\Exception\MalformedNotificationException
+     */
+    private function sendNotifications()
+    {
+        while ($notification = $this->notificationBuilder->getNotification()) {
+            try {
+                $connection = $this->getConnection($notification->getType());
+                $connection->setNotification($notification);
+
+                $response = $connection->sendRequest();
+                $response->processResponse();
+                $this->addResponse($response);
+
+            } catch (InvalidRecipientException $e) {
+                while ($recipient = $e->getRecipientDevice()) {
+                    $this->application->addInvalidRecipient($notification->getType(), $recipient);
+                }
+
+            } catch (DispatchMessageException $e) {
+                $this->logger->warning(
+                    sprintf("Dispatch message warning with code %d  '%s'", $e->getCode(), $e->getMessage())
+                );
+
+            } catch (MalformedNotificationException $e) {
+                $this->logger->error(
+                    sprintf("Malformed Notification error: %s", $e->getMessage())
+                );
+                return false;
+            }
+        }
+        return true;
     }
 }

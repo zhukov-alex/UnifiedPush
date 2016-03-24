@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService\GCM;
 
+use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\Message\RecipientDevice;
 use Zbox\UnifiedPush\Exception\InvalidRecipientException;
 use Zbox\UnifiedPush\Exception\DispatchMessageException;
@@ -19,11 +20,21 @@ use Zbox\UnifiedPush\Exception\RuntimeException;
  * Class Response
  * @package Zbox\UnifiedPush\NotificationService\GCM
  */
-class Response
+class Response implements ResponseInterface
 {
     const REQUEST_HAS_SUCCEED_CODE     = 200;
     const MALFORMED_NOTIFICATION_CODE  = 400;
     const AUTHENTICATION_ERROR_CODE    = 401;
+
+    /**
+     * @var \Buzz\Message\Response
+     */
+    protected $response;
+
+    /**
+     * @var \ArrayIterator
+     */
+    protected $recipients;
 
     /**
      * @param \Buzz\Message\Response $response
@@ -31,14 +42,25 @@ class Response
      */
     public function __construct(\Buzz\Message\Response $response, \ArrayIterator $recipients)
     {
+        $this->response     = $response;
+        $this->recipients   = $recipients;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processResponse()
+    {
+        $response   = $this->response;
         $statusCode = $response->getStatusCode();
+
         $this->checkResponseCode($statusCode);
 
         $encodedMessage = $response->getContent();
         $message = $this->decodeMessage($encodedMessage);
 
         $this->checkMessageStatus($message);
-        $this->checkMessageResult($message, $recipients);
+        $this->checkMessageResult($message, $this->recipients);
     }
 
     /**

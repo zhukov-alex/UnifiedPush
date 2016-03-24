@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService\MPNS;
 
+use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\NotificationService\ServiceClientBase;
 use Zbox\UnifiedPush\Exception\ClientException;
 use Buzz\Browser;
@@ -46,7 +47,7 @@ class ServiceClient extends ServiceClientBase
 
     /**
      * @throws ClientException
-     * @return bool
+     * @return ResponseInterface
      */
     public function sendRequest()
     {
@@ -70,9 +71,7 @@ class ServiceClient extends ServiceClientBase
             throw new ClientException($e->getMessage());
         }
 
-        new Response($response, $notification->getRecipients());
-
-        return true;
+        return new Response($response, $notification->getRecipients());
     }
 
     /**

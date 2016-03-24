@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService\MPNS;
 
+use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\Message\RecipientDevice;
 use Zbox\UnifiedPush\Exception\InvalidRecipientException;
 use Zbox\UnifiedPush\Exception\DispatchMessageException;
@@ -19,7 +20,7 @@ use Zbox\UnifiedPush\Exception\RuntimeException;
  * Class Response
  * @package Zbox\UnifiedPush\NotificationService\MPNS
  */
-class Response
+class Response implements ResponseInterface
 {
     const REQUEST_HAS_SUCCEED_CODE       = 200;
     const MALFORMED_NOTIFICATION_CODE    = 400;
@@ -31,13 +32,32 @@ class Response
     const SERVER_UNAVAILABLE_ERROR_CODE  = 503;
 
     /**
+     * @var \Buzz\Message\Response
+     */
+    protected $response;
+
+    /**
+     * @var \ArrayIterator
+     */
+    protected $recipients;
+
+    /**
      * @param \Buzz\Message\Response $response
      * @param \ArrayIterator $recipients
      */
     public function __construct(\Buzz\Message\Response $response, \ArrayIterator $recipients)
     {
-        $statusCode = $response->getStatusCode();
-        $this->checkResponseCode($statusCode, $recipients);
+        $this->response     = $response;
+        $this->recipients   = $recipients;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processResponse()
+    {
+        $statusCode = $this->response->getStatusCode();
+        $this->checkResponseCode($statusCode, $this->recipients);
     }
 
     /**

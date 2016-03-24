@@ -38,14 +38,6 @@ class ServiceFeedbackClient extends ServiceClient
             throw new ClientException($e->getMessage());
         }
 
-        $invalidRecipients = new \ArrayIterator();
-
-        foreach (str_split($feedbackData, 38) as $item)
-        {
-            $deviceData = unpack('N1timestamp/n1length/H*token', $item);
-            $invalidRecipients->append($deviceData['token']);
-        }
-
-        return $invalidRecipients;
+        return new ResponseFeedback($feedbackData, new \ArrayIterator());
     }
 }

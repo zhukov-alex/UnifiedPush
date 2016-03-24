@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService\APNS;
 
+use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\NotificationService\ServiceClientBase;
 use Zbox\UnifiedPush\Exception\ClientException;
 use Zbox\UnifiedPush\Utils\SocketClient;
@@ -71,7 +72,7 @@ class ServiceClient extends ServiceClientBase
      * or otherwise unintelligible, APNs returns an error-response packet
      *
      * @throws ClientException
-     * @return bool
+     * @return ResponseInterface
      */
     public function sendRequest()
     {
@@ -87,9 +88,6 @@ class ServiceClient extends ServiceClientBase
             throw new ClientException($e->getMessage());
         }
 
-        if ($errorResponseData) {
-            new Response($errorResponseData, $notification->getRecipients());
-        }
-        return true;
+        return new Response($errorResponseData ? : '', $notification->getRecipients());
     }
 }

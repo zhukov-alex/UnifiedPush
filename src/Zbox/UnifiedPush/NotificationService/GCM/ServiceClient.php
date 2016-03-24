@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService\GCM;
 
+use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\NotificationService\ServiceClientBase;
 use Zbox\UnifiedPush\Exception\ClientException;
 use Buzz\Browser;
@@ -41,7 +42,7 @@ class ServiceClient extends ServiceClientBase
      * the HTTP response contains a non-200 status code.
      *
      * @throws ClientException
-     * @return bool
+     * @return ResponseInterface
      */
     public function sendRequest()
     {
@@ -64,9 +65,7 @@ class ServiceClient extends ServiceClientBase
             throw new ClientException($e->getMessage());
         }
 
-        new Response($response, $notification->getRecipients());
-
-        return true;
+        return new Response($response, $notification->getRecipients());
     }
 
     /**

@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService\APNS;
 
+use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\Message\RecipientDevice;
 use Zbox\UnifiedPush\Exception\DispatchMessageException;
 use Zbox\UnifiedPush\Exception\InvalidRecipientException;
@@ -18,7 +19,7 @@ use Zbox\UnifiedPush\Exception\RuntimeException;
  * Class Response
  * @package Zbox\UnifiedPush\NotificationService\APNS
  */
-class Response
+class Response implements ResponseInterface
 {
     /**
      * APNS error-response packet length
@@ -60,23 +61,39 @@ class Response
     );
 
     /**
+     * @var string
+     */
+    protected $rawResponse;
+
+    /**
+     * @var \ArrayIterator
+     */
+    protected $recipients;
+
+    /**
      * @param string $binaryData
      * @param \ArrayIterator $recipients
      */
     public function __construct($binaryData, \ArrayIterator $recipients)
     {
-        $this->parseResponse($binaryData, $recipients);
+        $this->rawResponse = $binaryData;
+        $this->recipients  = $recipients;
     }
 
     /**
-     * Unpacks response data
+     * Unpacks and process response data
      *
-     * @param string $binaryData
-     * @param \ArrayIterator $recipients
+     * {@inheritdoc}
      */
-    public function parseResponse($binaryData, \ArrayIterator $recipients)
+    public function processResponse()
     {
-        $responseData = unpack("Ccommand/Cstatus/Nidentifier", $binaryData);
+        $rawResponse = $this->rawResponse;
+
+        if (empty($rawResponse)) {
+            return;
+        }
+
+        $responseData = unpack("Ccommand/Cstatus/Nidentifier", $rawResponse);
 
         $this->validateResponse($responseData);
 
@@ -87,6 +104,7 @@ class Response
                $statusCode == self::ERROR_INVALID_TOKEN_SIZE
             || $statusCode == self::ERROR_INVALID_TOKEN
         ) {
+            $recipients = $this->recipients;
             $recipients->current()->setIdentifierStatus(RecipientDevice::DEVICE_NOT_REGISTERED);
 
             throw new InvalidRecipientException($errorDescription, $recipients);

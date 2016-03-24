@@ -24,5 +24,8 @@ interface ServiceClientInterface
     public function setNotification(Notification $notification);
     public function getNotificationOrThrowException();
 
+    /**
+     * @return ResponseInterface
+     */
     public function sendRequest();
 }
