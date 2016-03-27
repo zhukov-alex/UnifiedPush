@@ -2,7 +2,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
-use Zbox\UnifiedPush\NotificationService\APNS\Credentials as APNSCredentials;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate as APNSCredentials;
 use Zbox\UnifiedPush\NotificationService\APNS\ServiceClient;
 
 class APNSServiceClientTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +27,7 @@ class APNSServiceClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = $this->client;
 
-        $this->assertInstanceOf('Zbox\UnifiedPush\NotificationService\CredentialsInterface', $client->getCredentials());
+        $this->assertInstanceOf('Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate', $client->getCredentials());
 
         $url = $client->getServiceURL();
         $this->assertTrue($url['port'] == 2195);

@@ -2,9 +2,10 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
-use Zbox\UnifiedPush\NotificationService\APNS\Credentials as APNSCredentials;
-use Zbox\UnifiedPush\NotificationService\GCM\Credentials as GCMCredentials;
-use Zbox\UnifiedPush\NotificationService\MPNS\Credentials as MPNSCredentials;
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsMapper;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate;
 use Zbox\UnifiedPush\Exception\DomainException;
 
 class CredentialsTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +26,7 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException('Zbox\UnifiedPush\Exception\InvalidArgumentException');
         }
 
-        $this->createCredentialsOfType($serviceType, $credentials);
+        self::createCredentialsOfType($serviceType, $credentials);
     }
 
     /**
@@ -76,19 +77,18 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
      * @param array $credentials
      * @return CredentialsInterface
      */
-    public function createCredentialsOfType($serviceType, $credentials)
+    public static function createCredentialsOfType($serviceType, $credentials)
     {
+        $mapper = new CredentialsMapper();
+
         switch ($serviceType) {
             case self::APNS_CREDENTIALS:
-                return new APNSCredentials($credentials);
+            case self::MPNS_CREDENTIALS:
+                return $mapper->mapCredentials(new SSLCertificate(), $credentials);
                 break;
 
             case self::GCM_CREDENTIALS:
-                return new GCMCredentials($credentials);
-                break;
-
-            case self::MPNS_CREDENTIALS:
-                return new MPNSCredentials($credentials);
+                return $mapper->mapCredentials(new AuthToken(), $credentials);
                 break;
 
             default:

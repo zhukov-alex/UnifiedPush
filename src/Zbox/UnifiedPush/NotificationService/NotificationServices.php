@@ -9,6 +9,9 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate;
 use Zbox\UnifiedPush\Exception\DomainException;
 
 /**
@@ -33,10 +36,27 @@ class NotificationServices
         if (!in_array($serviceName, array(
             self::APPLE_PUSH_NOTIFICATIONS_SERVICE,
             self::GOOGLE_CLOUD_MESSAGING,
-			self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE,
+            self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE,
         ))) {
             throw new DomainException(sprintf("Notification service '%s' is not supported.", $serviceName));
         }
         return $serviceName;
+    }
+
+    /**
+     * @param string $serviceName
+     * @return CredentialsInterface
+     */
+    public static function getCredentialsTypeByService($serviceName)
+    {
+        self::validateServiceName($serviceName);
+
+        $credentials = array(
+            self::APPLE_PUSH_NOTIFICATIONS_SERVICE      => new SSLCertificate(),
+            self::GOOGLE_CLOUD_MESSAGING                => new AuthToken(),
+            self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE  => new SSLCertificate()
+        );
+
+        return $credentials[$serviceName];
     }
 }

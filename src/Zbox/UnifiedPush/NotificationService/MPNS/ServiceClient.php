@@ -11,6 +11,7 @@ namespace Zbox\UnifiedPush\NotificationService\MPNS;
 
 use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\NotificationService\ServiceClientBase;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate;
 use Zbox\UnifiedPush\Exception\ClientException;
 use Buzz\Browser;
 use Buzz\Client\MultiCurl;
@@ -30,8 +31,8 @@ class ServiceClient extends ServiceClientBase
     {
         $client = new MultiCurl();
 
-        $credentials      = $this->getCredentials();
-        $isAuthenticated  = $credentials->isAuthenticated();
+        $credentials     = $this->getCredentials();
+        $isAuthenticated = $credentials instanceof SSLCertificate;
 
         $client->setVerifyPeer($isAuthenticated);
 

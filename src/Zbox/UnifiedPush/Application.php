@@ -11,6 +11,8 @@ namespace Zbox\UnifiedPush;
 
 use Zbox\UnifiedPush\Message\MessageInterface,
     Zbox\UnifiedPush\Message\RecipientDevice;
+use Zbox\UnifiedPush\NotificationService\NotificationServices;
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsMapper;
 use Zbox\UnifiedPush\Exception\DomainException,
     Zbox\UnifiedPush\Exception\InvalidArgumentException;
 
@@ -20,7 +22,10 @@ use Zbox\UnifiedPush\Exception\DomainException,
  */
 class Application
 {
-    const APPS_CREDENTIALS_FILENAME = 'applications_credentials.json';
+    /**
+     * @var CredentialsMapper
+     */
+    private $credentialsMapper;
 
     /**
      * @var string
@@ -49,10 +54,12 @@ class Application
 
     /**
      * @param string $applicationName
+     * @param CredentialsMapper $credentialsMapper
      */
-    public function __construct($applicationName)
+    public function __construct($applicationName, CredentialsMapper $credentialsMapper)
     {
         $this->setApplicationName($applicationName);
+        $this->credentialsMapper = $credentialsMapper;
         $this->messages = new \ArrayObject();
 
         return $this;
@@ -66,13 +73,10 @@ class Application
     public function getCredentialsFilePath()
     {
         if (!file_exists($this->credentialsFilePath)) {
-            $credentialsFilename = sprintf('%s.dist', static::APPS_CREDENTIALS_FILENAME);
-
             throw new InvalidArgumentException(
                 sprintf(
-                    "Application credentials file '%s' not exists. See example %s",
-                    $this->credentialsFilePath,
-                    $credentialsFilename
+                    "Application credentials file '%s' not exists",
+                    $this->credentialsFilePath
                 )
             );
         }
@@ -206,7 +210,17 @@ class Application
                 sprintf("Credentials for service '%s' was not initialized", $serviceName)
             );
         }
-        return $this->config[$serviceName];
+
+        $credentials = NotificationServices::getCredentialsTypeByService($serviceName);
+
+        return
+            $this
+                ->credentialsMapper
+                ->mapCredentials(
+                    $credentials,
+                    $this->config[$serviceName]
+                )
+            ;
     }
 
     /**

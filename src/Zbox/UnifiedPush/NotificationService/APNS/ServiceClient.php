@@ -11,8 +11,9 @@ namespace Zbox\UnifiedPush\NotificationService\APNS;
 
 use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\NotificationService\ServiceClientBase;
-use Zbox\UnifiedPush\Exception\ClientException;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate;
 use Zbox\UnifiedPush\Utils\SocketClient;
+use Zbox\UnifiedPush\Exception\ClientException;
 
 /**
  * Class ServiceClient
@@ -29,7 +30,7 @@ class ServiceClient extends ServiceClientBase
      */
     protected function createClient()
     {
-        /** @var Credentials $credentials */
+        /** @var SSLCertificate $credentials */
         $credentials         = $this->getCredentials();
         $url                 = $this->getServiceURL();
         $transport           = !empty($url['transport']) ? $url['transport'] : self::SECURE_TRANSPORT_DEFAULT;

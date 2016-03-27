@@ -11,6 +11,7 @@ namespace Zbox\UnifiedPush\NotificationService\GCM;
 
 use Zbox\UnifiedPush\NotificationService\ResponseInterface;
 use Zbox\UnifiedPush\NotificationService\ServiceClientBase;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken;
 use Zbox\UnifiedPush\Exception\ClientException;
 use Buzz\Browser;
 use Buzz\Client\MultiCurl;
@@ -73,7 +74,7 @@ class ServiceClient extends ServiceClientBase
      */
     protected function getHeaders()
     {
-        /** @var \Zbox\UnifiedPush\NotificationService\GCM\Credentials $credentials */
+        /** @var AuthToken $credentials */
         $credentials = $this->getCredentials();
 
         return

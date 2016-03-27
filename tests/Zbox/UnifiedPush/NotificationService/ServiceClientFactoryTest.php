@@ -39,11 +39,6 @@ class ServiceClientFactoryTest extends \PHPUnit_Framework_TestCase
 
         $serviceName = NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE;
 
-        $credentials = array(
-            'certificate' => APNSServiceClientTest::getPathToCertificate(),
-            'certificatePassPhrase' => 'certificatePassPhrase'
-        );
-
         $serviceUrl  = array(
             'host' => 'gateway.sandbox.push.apple.com',
             'port' => 2195
@@ -59,7 +54,19 @@ class ServiceClientFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getEnvironment')
             ->with($this->equalTo(ServiceClientFactory::ENVIRONMENT_PRODUCTION));
 
-        $client = $factory->createServiceClient($serviceName, $credentials, false);
+        $client = $factory->createServiceClient($serviceName, $this->getAPNSCredentialsStub(), false);
         $this->assertInstanceOf('Zbox\UnifiedPush\NotificationService\APNS\ServiceClient', $client);
+    }
+
+    protected function getAPNSCredentialsStub()
+    {
+        return
+            CredentialsTest::createCredentialsOfType(
+                NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE,
+                array(
+                    'certificate' => APNSServiceClientTest::getPathToCertificate(),
+                    'certificatePassPhrase' => 'certificatePassPhrase'
+                )
+            );
     }
 }

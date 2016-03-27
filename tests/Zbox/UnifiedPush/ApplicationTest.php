@@ -2,6 +2,8 @@
 
 namespace Zbox\UnifiedPush;
 
+use Zbox\UnifiedPush\NotificationService\CredentialsTest;
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsMapper;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +13,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->application = $this->getMockBuilder('\Zbox\UnifiedPush\Application')
-            ->setConstructorArgs(array(self::TEST_APPLICATION_NAME))
+            ->setConstructorArgs(
+                array(
+                    self::TEST_APPLICATION_NAME,
+                    new CredentialsMapper()
+                )
+            )
             ->setMethods(array('getCredentialsFilepath'))
             ->getMock();
 
@@ -32,7 +39,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             $this->application->getCredentialsByService($service),
-            $credentials
+            CredentialsTest::createCredentialsOfType($service, $credentials)
         );
     }
 

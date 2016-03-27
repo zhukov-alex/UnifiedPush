@@ -2,7 +2,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
-use Zbox\UnifiedPush\NotificationService\MPNS\Credentials as MPNSCredentials;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\NullCredentials as MPNSCredentials;
 use Zbox\UnifiedPush\NotificationService\MPNS\ServiceClient;
 
 class MPNSServiceClientTest extends \PHPUnit_Framework_TestCase
@@ -19,9 +19,7 @@ class MPNSServiceClientTest extends \PHPUnit_Framework_TestCase
         $credentialsObj = new MPNSCredentials($credentials);
         $client         = new ServiceClient($serviceUrl, $credentialsObj);
 
-        $this->assertInstanceOf('Zbox\UnifiedPush\NotificationService\CredentialsInterface', $client->getCredentials());
-
-        $this->assertFalse($client->getCredentials()->isAuthenticated());
+        $this->assertInstanceOf('Zbox\UnifiedPush\Utils\ClientCredentials\DTO\NullCredentials', $client->getCredentials());
 
         $this->assertInstanceOf('Buzz\Browser', $client->getClientConnection());
 

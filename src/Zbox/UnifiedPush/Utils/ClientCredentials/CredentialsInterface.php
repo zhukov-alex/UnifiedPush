@@ -7,6 +7,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Zbox\UnifiedPush\NotificationService;
+namespace Zbox\UnifiedPush\Utils\ClientCredentials;
 
 interface CredentialsInterface {}

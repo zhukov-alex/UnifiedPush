@@ -2,7 +2,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
-use Zbox\UnifiedPush\NotificationService\GCM\Credentials as GCMCredentials;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken as GCMCredentials;
 use Zbox\UnifiedPush\NotificationService\GCM\ServiceClient;
 
 class GCMServiceClientTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +21,7 @@ class GCMServiceClientTest extends \PHPUnit_Framework_TestCase
         $credentialsObj = new GCMCredentials($credentials);
         $client         = new ServiceClient($serviceUrl, $credentialsObj);
 
-        $this->assertInstanceOf('Zbox\UnifiedPush\NotificationService\CredentialsInterface', $client->getCredentials());
+        $this->assertInstanceOf('Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken', $client->getCredentials());
         $this->assertInstanceOf('Buzz\Browser', $client->getClientConnection());
 
         $url = $client->getServiceURL();

@@ -37,7 +37,7 @@ Load available notification services and authentication credentials for selected
 ```php
 <?php
 
-$application = new Zbox\UnifiedPush\Application('myApplication');
+$application = new Zbox\UnifiedPush\Application('myApplication', new CredentialsMapper());
 $application->setCredentialsFilePath($filePath);
 ```
 

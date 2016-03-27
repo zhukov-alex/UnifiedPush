@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
 use Zbox\UnifiedPush\Exception\DomainException;
 
 /**
@@ -102,7 +103,7 @@ class ServiceClientFactory
      * Creates client server connection by service name and sender credentials
      *
      * @param string $serviceName
-     * @param array $credentials
+     * @param CredentialsInterface $credentials
      * @param bool $isFeedback
      * @return ServiceClientInterface
      */
@@ -110,17 +111,12 @@ class ServiceClientFactory
     {
         $serviceUrl = $this->getServiceURL($serviceName, $isFeedback);
 
-        $credentialsClass   = sprintf(
-            'Zbox\UnifiedPush\NotificationService\%s\Credentials',
-            $serviceName
-        );
-        $clientClass        = sprintf(
+        $clientClass = sprintf(
             'Zbox\UnifiedPush\NotificationService\%s\%s',
             $serviceName,
             $isFeedback ? 'ServiceFeedbackClient' : 'ServiceClient'
         );
 
-        $credentials        = new $credentialsClass($credentials);
         $clientConnection   = new $clientClass($serviceUrl, $credentials);
 
         return $clientConnection;

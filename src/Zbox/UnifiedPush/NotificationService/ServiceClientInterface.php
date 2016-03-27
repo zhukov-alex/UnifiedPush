@@ -9,6 +9,7 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
 use Zbox\UnifiedPush\Notification\Notification;
 
 interface ServiceClientInterface
