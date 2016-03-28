@@ -82,7 +82,7 @@ class Response implements ResponseInterface
 
             case self::AUTHENTICATION_ERROR_CODE:
                 throw new DispatchMessageException(
-                    "Sending this notification is unauthorized"
+                    "Sending this notification is unauthorized", self::AUTHENTICATION_ERROR_CODE
                 );
 
             case self::INVALID_RECIPIENT_ERROR_CODE:
@@ -95,22 +95,26 @@ class Response implements ResponseInterface
 
             case self::INVALID_METHOD_ERROR_CODE:
                 throw new DispatchMessageException(
-                    "Invalid method. Only POST is allowed when sending a notification request"
+                    "Invalid method. Only POST is allowed when sending a notification request",
+                    self::INVALID_METHOD_ERROR_CODE
                 );
 
             case self::QUOTA_EXCEEDED_ERROR_CODE:
                 throw new DispatchMessageException(
-                    "Unauthenticated service has reached the per-day throttling limit or there are many notifications per second"
+                    "Unauthenticated service has reached the per-day throttling limit or there are many notifications per second",
+                    self::QUOTA_EXCEEDED_ERROR_CODE
                 );
 
             case self::DEVICE_INACTIVE_ERROR_CODE:
                 throw new DispatchMessageException(
-                    "The device is in a disconnected state"
+                    "The device is in a disconnected state",
+                    self::DEVICE_INACTIVE_ERROR_CODE
                 );
 
             case self::SERVER_UNAVAILABLE_ERROR_CODE:
                 throw new DispatchMessageException(
-                    "The Push Notification Service is unable to process the request"
+                    "The Push Notification Service is unable to process the request",
+                    self::SERVER_UNAVAILABLE_ERROR_CODE
                 );
 
             default:

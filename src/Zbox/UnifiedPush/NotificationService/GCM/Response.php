@@ -72,7 +72,7 @@ class Response implements ResponseInterface
         $message = json_decode($json);
 
         if (is_null($message)) {
-            throw new DispatchMessageException("Message could not be decoded");
+            throw new RuntimeException("Message could not be decoded");
         }
 
         return $message;
@@ -94,12 +94,14 @@ class Response implements ResponseInterface
 
             case self::MALFORMED_NOTIFICATION_CODE:
                 throw new MalformedNotificationException(
-                    "The request could not be parsed as JSON, or it contained invalid fields"
+                    "The request could not be parsed as JSON, or it contained invalid fields",
+                    self::MALFORMED_NOTIFICATION_CODE
                 );
 
             case self::AUTHENTICATION_ERROR_CODE:
                 throw new DispatchMessageException(
-                    "There was an error authenticating the sender account."
+                    "There was an error authenticating the sender account.",
+                    self::AUTHENTICATION_ERROR_CODE
                 );
 
             default:

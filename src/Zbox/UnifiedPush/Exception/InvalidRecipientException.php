@@ -30,17 +30,10 @@ class InvalidRecipientException extends DispatchMessageException
     }
 
     /**
-     * @return \Zbox\UnifiedPush\Message\RecipientDevice
+     * @return \ArrayIterator
      */
-    public function getRecipientDevice()
+    public function getRecipientCollection()
     {
-        $collection = $this->recipientCollection;
-
-        if ($collection->valid()) {
-            $device = $collection->current();
-            $collection->next();
-            return $device;
-        }
-        return null;
+        return $this->recipientCollection;
     }
 }

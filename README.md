@@ -18,7 +18,7 @@ The recommended way to install UnifiedPush is [through composer](http://getcompo
 ```
 
 ## Features
- - Unified interface that suports sending push notifications for platforms:
+ - Unified interface that supports sending push notifications for platforms:
    - Apple (APNS)
    - Android (GCM)
    - Windows Phone (MPNS)
@@ -30,19 +30,52 @@ The recommended way to install UnifiedPush is [through composer](http://getcompo
 
 ## Usage
 
-### Load application credentials
+### Configure Notification Services Client Factory
 
-Load available notification services and authentication credentials for selected application.
+Create service client factory configured with credentials.
 
 ```php
 <?php
 
-$application = new Zbox\UnifiedPush\Application('myApplication', new CredentialsMapper());
-$application->setCredentialsFilePath($filePath);
+use Zbox\UnifiedPush\NotificationService\ServiceClientFactory;
+use Zbox\UnifiedPush\NotificationService\ServiceCredentialsFactory;
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsMapper;
+
+$credentialsFactory = 
+    new ServiceCredentialsFactory(
+        new CredentialsMapper()
+    );
+
+$credentialsFactory->setCredentialsPath('pathToCredentialsConfig');
+
+$clientFactory = new ServiceClientFactory($credentialsFactory);
+$clientFactory->setDefaultConfigPath();
 ```
 
-### Create message
-Create a message of one of supported types, then add messages to collection.
+### Initialize Message Dispatcher
+
+Initialize class with client factory, notification builder and response handler.
+
+```php
+<?php
+
+use Zbox\UnifiedPush\Dispatcher;
+use Zbox\UnifiedPush\Notification\NotificationBuilder;
+use Zbox\UnifiedPush\NotificationService\ResponseHandler;
+
+$dispatcher =
+    new Dispatcher(
+        $clientFactory,
+        new NotificationBuilder(),
+        new ResponseHandler()
+    );
+
+$dispatcher->setDevelopmentMode(true);
+```
+
+### Create messages
+
+Create messages of type APNS, GCM, MPNS (Raw, Tile or Toast).
 
 ```php
 <?php
@@ -61,53 +94,42 @@ $message2 = new GCMMessage();
 $message2
 	->setCollapseKey('key')
 	->addRecipientIdentifiers(
-		new ArrayIterator([
+       new \ArrayIterator([
 			'deviceToken1', 
 			'deviceToken2'
 		])
 	)
-	->setPayloadData(array(
+    ->setPayloadData([
 		'keyA' => 'value1',
 		'keyB' => 'value2',
-		)
-	);
-
-$application->addMessage($message1);
-$application->addMessage($message2);
+    ]);
 ```
 
-### Initialize dispatcher
+### Dispatch messages
 
-Initialize dispatcher, then set environment and try to send message queue, then try to load feedback (for services, where available). Then get report of any invalid recipient device identifiers.
+Send messages and load feedback.
 
 ```php
 <?php
 
-use Zbox\UnifiedPush\NotificationService\ServiceClientFactory;
-use Zbox\UnifiedPush\Notification\NotificationBuilder;
-
-$dispatcher = 
-    new Zbox\UnifiedPush\Dispatcher(
-        $application,
-        new ServiceClientFactory(),
-        new NotificationBuilder()
-    );
-
-$dispatcher->setDevelopmentMode(true);
-
-$dispatcher->dispatch(); // sending all messages
-$dispatcher->loadFeedback();
+$dispatcher
+    ->dispatch($message1)
+    ->dispatch($message2)
+    ->loadFeedback();
 ```
 
-### Get report
+### Status
 
-Get report about failed devices.
-
+Handle responses to see a report on dispatch errors.
 
 ```php
 <?php
 
-$application->getInvalidRecipients();
+$responseHandler = $dispatcher->getResponseHandler();
+$responseHandler->handleResponseCollection();
+
+$invalidRecipients  = $responseHandler->getInvalidRecipients();
+$messageErrors      = $responseHandler->getMessageErrors();
 ```
 
 ## License

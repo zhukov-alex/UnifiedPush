@@ -1,0 +1,16 @@
+{
+    "APNS": {
+        "push": {
+            "development": {
+                "host": "gateway.sandbox.push.apple.com",
+                "port": 2195
+            }
+        },
+        "feedback": {
+            "development": {
+                "host": "feedback.sandbox.push.apple.com",
+                "port": 2196
+            }
+        }
+    }
+}

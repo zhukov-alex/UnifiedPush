@@ -32,7 +32,7 @@ class NotificationBuilder
     /**
      * @var \ArrayIterator
      */
-    private $notifications;
+    private $notificationCollection;
 
     /**
      * @param PayloadHandlerInterface $handler
@@ -50,18 +50,11 @@ class NotificationBuilder
     }
 
     /**
-     * @return Notification|null
+     * @return \ArrayIterator
      */
-    public function getNotification()
+    public function getNotificationCollection()
     {
-        $collection = $this->notifications;
-
-        if ($collection->valid()) {
-            $notification = $collection->current();
-            $collection->next();
-            return $notification;
-        }
-        return null;
+        return $this->notificationCollection;
     }
 
     /**
@@ -93,7 +86,7 @@ class NotificationBuilder
 
         while (!$recipientQueue->isEmpty()) {
             $notification = $this->createNotification($recipientQueue->dequeue());
-            $this->notifications->append($notification);
+            $this->notificationCollection->append($notification);
         }
 
         return $this;

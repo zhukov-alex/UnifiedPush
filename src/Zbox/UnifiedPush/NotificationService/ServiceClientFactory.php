@@ -9,7 +9,8 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
-use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
+use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+use Zbox\UnifiedPush\Exception\RuntimeException;
 use Zbox\UnifiedPush\Exception\DomainException;
 
 /**
@@ -32,16 +33,31 @@ class ServiceClientFactory
     private $environment;
 
     /**
+     * @var ServiceCredentialsFactory
+     */
+    private $credentialsFactory;
+
+    /**
+     * @var string
+     */
+    private $serviceConfigPath;
+
+    /**
      * Notification services connection config
      *
      * @var array
      */
-    private $config;
+    private $serviceConfig;
 
-    public function __construct()
+    /**
+     * @param ServiceCredentialsFactory $credentialsFactory
+     */
+    public function __construct(ServiceCredentialsFactory $credentialsFactory)
     {
         $this->setEnvironment(self::ENVIRONMENT_PRODUCTION);
-        $this->loadServicesConfig();
+
+        $this->credentialsFactory = $credentialsFactory;
+
         return $this;
     }
 
@@ -76,6 +92,43 @@ class ServiceClientFactory
     }
 
     /**
+     * @param string $serviceConfigPath
+     * @return $this
+     */
+    public function setServiceConfigPath($serviceConfigPath)
+    {
+        $this->serviceConfigPath = $serviceConfigPath;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setDefaultConfigPath()
+    {
+        $path =
+            __DIR__
+            . DIRECTORY_SEPARATOR . '..'
+            . DIRECTORY_SEPARATOR . 'Resources'
+            . DIRECTORY_SEPARATOR . 'notification_services.json';
+
+        $this->setServiceConfigPath($path);
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getServiceConfig()
+    {
+        if (empty($this->serviceConfig)) {
+            $this->loadServicesConfig();
+        }
+
+        return $this->serviceConfig;
+    }
+
+    /**
      * Gets notification service url by service name
      *
      * @param string $serviceName
@@ -88,26 +141,27 @@ class ServiceClientFactory
         $serviceType = $isFeedback ? self::FEEDBACK_SERVICE : self::PUSH_SERVICE;
         $environment = $this->getEnvironment();
 
-        if (empty($this->config[$serviceName][$serviceType][static::ENVIRONMENT_DEVELOPMENT])) {
+        $serviceConfig = $this->getServiceConfig();
+
+        if (empty($serviceConfig[$serviceName][$serviceType][static::ENVIRONMENT_DEVELOPMENT])) {
             $environment = static::ENVIRONMENT_PRODUCTION;
         }
 
-        if (empty($this->config[$serviceName][$serviceType][$environment])) {
+        if (empty($serviceConfig[$serviceName][$serviceType][$environment])) {
             throw new DomainException("Service url is not defined");
         }
 
-        return $this->config[$serviceName][$serviceType][$environment];
+        return $serviceConfig[$serviceName][$serviceType][$environment];
     }
 
     /**
      * Creates client server connection by service name and sender credentials
      *
      * @param string $serviceName
-     * @param CredentialsInterface $credentials
      * @param bool $isFeedback
      * @return ServiceClientInterface
      */
-    public function createServiceClient($serviceName, $credentials, $isFeedback = false)
+    public function createServiceClient($serviceName, $isFeedback = false)
     {
         $serviceUrl = $this->getServiceURL($serviceName, $isFeedback);
 
@@ -117,6 +171,7 @@ class ServiceClientFactory
             $isFeedback ? 'ServiceFeedbackClient' : 'ServiceClient'
         );
 
+        $credentials        = $this->credentialsFactory->getCredentialsByService($serviceName);
         $clientConnection   = new $clientClass($serviceUrl, $credentials);
 
         return $clientConnection;
@@ -127,14 +182,26 @@ class ServiceClientFactory
      *
      * @return $this
      */
-    protected function loadServicesConfig()
+    public function loadServicesConfig()
     {
-        $filePath = __DIR__
-            . DIRECTORY_SEPARATOR . '..'
-            . DIRECTORY_SEPARATOR . 'Resources'
-            . DIRECTORY_SEPARATOR . 'notification_services.json';
+        $configPath = $this->serviceConfigPath;
 
-        $this->config = json_decode(file_get_contents($filePath), true);
+        if (!file_exists($configPath)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "Service config file '%s' doesn`t exists",
+                    $configPath
+                )
+            );
+        }
+
+        $config = json_decode(file_get_contents($configPath), true);
+
+        if (!is_array($config)) {
+            throw new RuntimeException('Empty credentials config');
+        }
+
+        $this->serviceConfig = $config;
 
         return $this;
     }

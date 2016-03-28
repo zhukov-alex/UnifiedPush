@@ -100,6 +100,8 @@ abstract class MessageBase implements MessageInterface
      */
     public function addRecipientIdentifiers(\ArrayIterator $collection)
     {
+        $collection->rewind();
+
         while ($collection->valid()) {
             $deviceIdentifier = $collection->current();
             $this->addRecipient($deviceIdentifier);
