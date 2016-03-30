@@ -50,6 +50,16 @@ class ServiceCredentialsFactory
     }
 
     /**
+     * @param array $config
+     * @return $this
+     */
+    public function setConfig(array $config)
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    /**
      * Load sender`s notification services credentials
      *
      * @return $this

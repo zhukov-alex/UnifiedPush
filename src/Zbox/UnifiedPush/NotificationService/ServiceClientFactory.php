@@ -129,6 +129,16 @@ class ServiceClientFactory
     }
 
     /**
+     * @param array $serviceConfig
+     * @return $this
+     */
+    public function setServiceConfig(array $serviceConfig)
+    {
+        $this->serviceConfig = $serviceConfig;
+        return $this;
+    }
+
+    /**
      * Gets notification service url by service name
      *
      * @param string $serviceName
