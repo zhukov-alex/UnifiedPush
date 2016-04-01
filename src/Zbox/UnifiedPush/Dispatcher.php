@@ -10,6 +10,7 @@
 namespace Zbox\UnifiedPush;
 
 use Zbox\UnifiedPush\Message\MessageInterface;
+use Zbox\UnifiedPush\Message\MessageCollection;
 use Zbox\UnifiedPush\Notification\NotificationBuilder;
 use Zbox\UnifiedPush\NotificationService\NotificationServices,
     Zbox\UnifiedPush\NotificationService\ServiceClientInterface,
@@ -173,6 +174,20 @@ class Dispatcher implements LoggerAwareInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @param MessageCollection $messages
+     */
+    public function dispatchAll(MessageCollection $messages)
+    {
+        $collection = $messages->getMessageCollection();
+
+        while ($collection->valid()) {
+            $message = $collection->current();
+            $this->dispatch($message);
+            $collection->next();
+        }
     }
 
     /**

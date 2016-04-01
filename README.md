@@ -80,6 +80,7 @@ Create messages of type APNS, GCM, MPNS (Raw, Tile or Toast).
 ```php
 <?php
 
+use Zbox\UnifiedPush\Message\MessageCollection;
 use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
 use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
 
@@ -103,6 +104,12 @@ $message2
 		'keyA' => 'value1',
 		'keyB' => 'value2',
     ]);
+    
+$messages = 
+    new MessageCollection([
+        $message1, 
+        $message2
+    ]);
 ```
 
 ### Dispatch messages
@@ -113,8 +120,7 @@ Send messages and load feedback.
 <?php
 
 $dispatcher
-    ->dispatch($message1)
-    ->dispatch($message2)
+    ->dispatchAll($messages)
     ->loadFeedback();
 ```
 
