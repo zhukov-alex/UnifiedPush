@@ -35,6 +35,14 @@ class NotificationBuilder
     private $notificationCollection;
 
     /**
+     * NotificationBuilder constructor.
+     */
+    public function __construct()
+    {
+        $this->notificationCollection = new \ArrayIterator();
+    }
+
+    /**
      * @param PayloadHandlerInterface $handler
      * @return $this
      */
@@ -47,6 +55,14 @@ class NotificationBuilder
         }
 
         return $this;
+    }
+
+    /**
+     * @return PayloadHandlerInterface[]
+     */
+    public function getPayloadHandlers()
+    {
+        return $this->payloadHandlers;
     }
 
     /**
@@ -104,18 +120,21 @@ class NotificationBuilder
         $message = clone $this->message;
         $message->setRecipientDeviceCollection($recipients);
 
-        foreach ($this->payloadHandlers as $handler) {
+        $handlers = $this->getPayloadHandlers();
+
+        foreach ($handlers as $handler) {
             if ($handler->isSupported($message)) {
                 $packedPayload  = $this->handlePayload($handler, $message);
                 $customData     = $handler->getCustomNotificationData();
 
-                return
-                    (new Notification())
-                        ->setType($message->getMessageType())
-                        ->setRecipients($recipients)
-                        ->setPayload($packedPayload)
-                        ->setCustomNotificationData($customData)
-                    ;
+                $notification = new Notification();
+                $notification
+                    ->setType($message->getMessageType())
+                    ->setRecipients($recipients)
+                    ->setPayload($packedPayload)
+                    ->setCustomNotificationData($customData)
+                ;
+                return $notification;
             }
         }
 

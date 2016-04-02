@@ -21,7 +21,7 @@ class JsonEncoder
      */
     public static function jsonEncode($data)
     {
-        if (version_compare(PHP_VERSION, '5.4', '>=' && defined('JSON_UNESCAPED_UNICODE'))) {
+        if (version_compare(PHP_VERSION, '5.4', '>=') && defined('JSON_UNESCAPED_UNICODE')) {
             return json_encode($data, JSON_UNESCAPED_UNICODE);
         } else {
             return json_encode($data);
