@@ -129,6 +129,20 @@ class RecipientDevice
     }
 
     /**
+     * @return bool
+     */
+    public function isInvalidRecipient()
+    {
+        return in_array(
+            $this->identifierStatus,
+            array(
+                static::DEVICE_NOT_REGISTERED,
+                static::IDENTIFIER_NEED_TO_BE_REPLACED
+            )
+        );
+    }
+
+    /**
      * @return string
      */
     public function __toString()
