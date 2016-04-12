@@ -11,6 +11,7 @@ namespace Zbox\UnifiedPush;
 
 use Zbox\UnifiedPush\Message\MessageInterface;
 use Zbox\UnifiedPush\Message\MessageCollection;
+use Zbox\UnifiedPush\Notification\Notification;
 use Zbox\UnifiedPush\Notification\NotificationBuilder;
 use Zbox\UnifiedPush\NotificationService\NotificationServices,
     Zbox\UnifiedPush\NotificationService\ServiceClientInterface,
@@ -147,15 +148,8 @@ class Dispatcher implements LoggerAwareInterface
     public function dispatch(MessageInterface $message)
     {
         try {
-            $this->logger->info(
-                sprintf(
-                    "Dispatching message id: '%s'",
-                    $message->getMessageIdentifier()
-                )
-            );
-
             $this->notificationBuilder->buildNotifications($message);
-            $this->sendNotifications($message->getMessageIdentifier());
+            $this->sendNotifications();
 
         } catch (ClientException $e) {
             $this->logger->error(
@@ -228,10 +222,8 @@ class Dispatcher implements LoggerAwareInterface
 
     /**
      * Tries to connect and send a message to notification service
-     *
-     * @param string $messageIdentifier
      */
-    private function sendNotifications($messageIdentifier)
+    private function sendNotifications()
     {
         $notifications = $this->notificationBuilder->getNotificationCollection();
 
@@ -239,10 +231,17 @@ class Dispatcher implements LoggerAwareInterface
             $connection = $this->getConnection($notification->getType());
             $connection->setNotification($notification);
 
+            $this->logger->info(
+                sprintf(
+                    "Dispatching notification id: '%s'",
+                    $notification->getIdentifier()
+                )
+            );
+
             $this
                 ->responseHandler
                 ->addIdentifiedResponse(
-                    $messageIdentifier,
+                    $notification->getIdentifier(),
                     $connection->sendRequest()
                 );
         }

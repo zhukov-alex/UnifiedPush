@@ -11,8 +11,6 @@ namespace Zbox\UnifiedPush\Message;
 
 interface MessageInterface
 {
-    public function getMessageIdentifier();
-
     public function getMessageType();
 
     public function getMaxRecipientsPerMessage();
@@ -24,6 +22,8 @@ interface MessageInterface
     public function addRecipient($deviceIdentifier);
 
     public function addRecipientIdentifiers(\ArrayIterator $collection);
+
+    public function getExpirationTime();
 
     public function validateRecipient($token);
 }

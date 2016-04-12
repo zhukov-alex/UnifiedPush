@@ -85,7 +85,7 @@ class MPNS extends PayloadHandler
     {
         return
             array(
-                'message_id'        => $this->message->getMessageIdentifier(),
+                'message_id'        => $this->notificationId,
                 'delay_interval'    => $this->message->getDelayInterval(),
                 'message_type'      => $this->message->getMPNSType()
             );

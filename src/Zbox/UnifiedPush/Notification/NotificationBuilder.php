@@ -124,11 +124,17 @@ class NotificationBuilder
 
         foreach ($handlers as $handler) {
             if ($handler->isSupported($message)) {
-                $packedPayload  = $this->handlePayload($handler, $message);
+                $notificationId = uniqid();
+                $handler
+                    ->setNotificationId($notificationId)
+                    ->setMessage($message);
+
+                $packedPayload  = $this->handlePayload($handler);
                 $customData     = $handler->getCustomNotificationData();
 
                 $notification = new Notification();
                 $notification
+                    ->setIdentifier($notificationId)
                     ->setType($message->getMessageType())
                     ->setRecipients($recipients)
                     ->setPayload($packedPayload)
@@ -148,44 +154,16 @@ class NotificationBuilder
 
     /**
      * @param PayloadHandlerInterface $handler
-     * @param MessageInterface $message
      * @return string
      * @throws MalformedNotificationException
      */
-    private function handlePayload(PayloadHandlerInterface $handler, MessageInterface $message)
+    private function handlePayload(PayloadHandlerInterface $handler)
     {
-        $handler->setMessage($message);
+        $payload        = $handler->createPayload();
+        $packedPayload  = $handler->packPayload($payload);
 
-        $payload = $handler->createPayload();
-        $packedPayload = $handler->packPayload($payload);
-
-        $this->validatePayload($handler, $packedPayload);
+        $handler->validatePayload($packedPayload);
 
         return $packedPayload;
-    }
-
-    /**
-     * Check if maximum size allowed for a notification payload exceeded
-     *
-     * @param PayloadHandlerInterface $handler
-     * @param string $payload
-     * @throws MalformedNotificationException
-     */
-    private function validatePayload(PayloadHandlerInterface $handler, $payload)
-    {
-        $message     = $this->message;
-        $messageType = $message->getMessageType();
-
-        $maxLength   = $handler->getPayloadMaxLength();
-
-        if (strlen($payload) > $maxLength) {
-            throw new MalformedNotificationException(
-                sprintf(
-                    "The maximum size allowed for '%s' notification payload is %d bytes",
-                    $messageType,
-                    $maxLength
-                )
-            );
-        }
     }
 }

@@ -35,7 +35,6 @@ class MPNSRaw extends MPNSBase
      */
     public function __construct(array $data = array())
     {
-        $this->setMessageIdentifier(uniqid());
         $this->recipientCollection = new \ArrayIterator();
 
         foreach ($data as $key => $value) {

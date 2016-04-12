@@ -11,6 +11,7 @@ namespace Zbox\UnifiedPush\Notification;
 
 use Zbox\UnifiedPush\Message\MessageInterface;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
+use Zbox\UnifiedPush\Exception\MalformedNotificationException;
 
 /**
  * Class PayloadHandler
@@ -22,6 +23,11 @@ abstract class PayloadHandler implements PayloadHandlerInterface
      * @var MessageInterface
      */
     protected $message;
+
+    /**
+     * @var int
+     */
+    protected $notificationId;
 
     /**
      * @param MessageInterface $message
@@ -45,6 +51,16 @@ abstract class PayloadHandler implements PayloadHandlerInterface
     }
 
     /**
+     * @param int $id
+     * @return $this
+     */
+    public function setNotificationId($id)
+    {
+        $this->notificationId = $id;
+        return $this;
+    }
+
+    /**
      * Gets maximum size allowed for notification payload
      *
      * @return int
@@ -60,5 +76,27 @@ abstract class PayloadHandler implements PayloadHandlerInterface
     public function getCustomNotificationData()
     {
         return array();
+    }
+
+    /**
+     * Check if maximum size allowed for a notification payload exceeded
+     *
+     * @param string $packedPayload
+     * @throws MalformedNotificationException
+     */
+    public function validatePayload($packedPayload)
+    {
+        $messageType = $this->message->getMessageType();
+        $maxLength   = $this->getPayloadMaxLength();
+
+        if (strlen($packedPayload) > $maxLength) {
+            throw new MalformedNotificationException(
+                sprintf(
+                    "The maximum size allowed for '%s' notification payload is %d bytes",
+                    $messageType,
+                    $maxLength
+                )
+            );
+        }
     }
 }

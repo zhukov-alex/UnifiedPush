@@ -33,14 +33,6 @@ abstract class MessageBase implements MessageInterface
     protected $expirationTime;
 
     /**
-     * An arbitrary, opaque value that identifies this notification.
-     * This identifier is used for reporting errors to your server
-     *
-     * @var string
-     */
-    protected $messageIdentifier;
-
-    /**
      * Collection of recipient devices
      *
      * @var \ArrayIterator
@@ -52,7 +44,6 @@ abstract class MessageBase implements MessageInterface
      */
     public function __construct(array $data = array())
     {
-        $this->setMessageIdentifier(uniqid());
         $this->recipientCollection = new \ArrayIterator();
 
         foreach ($data as $key => $value) {
@@ -152,26 +143,6 @@ abstract class MessageBase implements MessageInterface
     {
         $this->expirationTime = DateTimeHelper::updateTimezoneToUniversal($expirationTime);
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMessageIdentifier()
-    {
-        return $this->messageIdentifier;
-    }
-
-    /**
-     * @param string $messageIdentifier
-     * @throws InvalidArgumentException
-     */
-    public function setMessageIdentifier($messageIdentifier)
-    {
-        if (!is_scalar($messageIdentifier)) {
-            throw new InvalidArgumentException("Message identifier must be a scalar value");
-        }
-        $this->messageIdentifier = $messageIdentifier;
     }
 
     /**

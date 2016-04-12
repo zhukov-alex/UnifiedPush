@@ -74,7 +74,7 @@ class APNS extends PayloadHandler
 
         $recipientId = $message->getRecipientDeviceCollection()->current()->getIdentifier();
 
-        $messageRecipientId = $message->getMessageIdentifier() . '_' . $recipientId;
+        $messageRecipientId = $this->notificationId . '_' . $recipientId;
 
         $packedPayload =
             pack('C', 1). // Command push

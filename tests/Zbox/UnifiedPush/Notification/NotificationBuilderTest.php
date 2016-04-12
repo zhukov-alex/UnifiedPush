@@ -71,10 +71,12 @@ class NotificationBuilderTest extends \PHPUnit_Framework_TestCase
                 ->setMethods(array(
                     'isSupported',
                     'setMessage',
+                    'setNotificationId',
                     'getPayloadMaxLength',
                     'getCustomNotificationData',
                     'createPayload',
-                    'packPayload'
+                    'packPayload',
+                    'validatePayload'
                 ))
                 ->getMock();
 

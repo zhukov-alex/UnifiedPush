@@ -30,6 +30,12 @@ interface PayloadHandlerInterface
     public function setMessage(MessageInterface $message);
 
     /**
+     * @param int $id
+     * @return $this
+     */
+    public function setNotificationId($id);
+
+    /**
      * @return int
      */
     public function getPayloadMaxLength();
@@ -49,4 +55,9 @@ interface PayloadHandlerInterface
      * @return string
      */
     public function packPayload($payload);
+
+    /**
+     * @param string $packedPayload
+     */
+    public function validatePayload($packedPayload);
 }

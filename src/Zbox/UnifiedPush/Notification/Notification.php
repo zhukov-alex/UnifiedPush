@@ -18,6 +18,14 @@ use Zbox\UnifiedPush\NotificationService\NotificationServices;
 class Notification
 {
     /**
+     * An arbitrary, opaque value that identifies this notification.
+     * This identifier is used for reporting errors to your server
+     *
+     * @var string
+     */
+    protected $identifier;
+
+    /**
      * @var string
      */
     protected $type;
@@ -38,6 +46,24 @@ class Notification
      * @var array
      */
     private $customNotificationData = array();
+
+    /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @param string $identifier
+     * @return Notification
+     */
+    public function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
 
     /**
      * @return string
