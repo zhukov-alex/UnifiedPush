@@ -140,16 +140,73 @@ class Dispatcher implements LoggerAwareInterface
     }
 
     /**
-     * Tries to dispatch all messages to notification service
+     * Build notification and send it to notification service
      *
      * @param MessageInterface $message
      * @return $this
      */
     public function dispatch(MessageInterface $message)
     {
+        $builder = $this->notificationBuilder;
+
+        $builder->buildNotifications($message);
+
+        $notifications = $builder->getNotificationCollection();
+
+        /** @var Notification $notification */
+        foreach ($notifications as $notification) {
+            $this->sendNotification($notification);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Tries to dispatch all messages to notification service
+     *
+     * @param MessageCollection $messages
+     * @return $this
+     */
+    public function dispatchAll(MessageCollection $messages)
+    {
+        $collection = $messages->getMessageCollection();
+
+        while ($collection->valid()) {
+            $message = $collection->current();
+            $this->dispatch($message);
+            $collection->next();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Tries to connect and send a notification
+     *
+     * @param Notification $notification
+     * @return bool
+     */
+    public function sendNotification(Notification $notification)
+    {
         try {
-            $this->notificationBuilder->buildNotifications($message);
-            $this->sendNotifications();
+            $connection = $this->getConnection($notification->getType());
+            $connection->setNotification($notification);
+
+            $this->logger->info(
+                sprintf(
+                    "Dispatching notification id: %s",
+                    $notification->getIdentifier()
+                )
+            );
+
+            $this
+                ->responseHandler
+                ->addIdentifiedResponse(
+                    $notification->getIdentifier(),
+                    $connection->sendRequest()
+                );
+
+            return true;
 
         } catch (ClientException $e) {
             $this->logger->error(
@@ -167,21 +224,7 @@ class Dispatcher implements LoggerAwareInterface
             );
         }
 
-        return $this;
-    }
-
-    /**
-     * @param MessageCollection $messages
-     */
-    public function dispatchAll(MessageCollection $messages)
-    {
-        $collection = $messages->getMessageCollection();
-
-        while ($collection->valid()) {
-            $message = $collection->current();
-            $this->dispatch($message);
-            $collection->next();
-        }
+        return false;
     }
 
     /**
@@ -218,32 +261,5 @@ class Dispatcher implements LoggerAwareInterface
         }
 
         return $this;
-    }
-
-    /**
-     * Tries to connect and send a message to notification service
-     */
-    private function sendNotifications()
-    {
-        $notifications = $this->notificationBuilder->getNotificationCollection();
-
-        foreach ($notifications as $notification) {
-            $connection = $this->getConnection($notification->getType());
-            $connection->setNotification($notification);
-
-            $this->logger->info(
-                sprintf(
-                    "Dispatching notification id: '%s'",
-                    $notification->getIdentifier()
-                )
-            );
-
-            $this
-                ->responseHandler
-                ->addIdentifiedResponse(
-                    $notification->getIdentifier(),
-                    $connection->sendRequest()
-                );
-        }
     }
 }
