@@ -2,30 +2,31 @@
 
 namespace Zbox\UnifiedPush\Message;
 
-use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
-use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
-
 class RecipientDeviceTest extends \PHPUnit_Framework_TestCase
 {
     const VALID_GCM_IDENTIFIER = 'VWX4efa148e';
 
     /**
      * @dataProvider messageProvider
-     * @param MessageInterface $message
+     *
+     * @param string $message
      * @param bool $isValid
      */
     public function testSetIdentifier($message, $isValid)
     {
-        $recipient = $this->getMockBuilder('Zbox\UnifiedPush\Message\RecipientDevice')
+        /** @var MessageInterface $messageMock */
+        $messageMock = $this->getMockBuilder($message)
             ->setMethods(null)
-            ->disableOriginalConstructor()
             ->getMock();
 
         if (!$isValid) {
             $this->setExpectedException('Zbox\UnifiedPush\Exception\InvalidArgumentException');
         }
 
-        $recipient->setIdentifier(self::VALID_GCM_IDENTIFIER, $message);
+        $recipient = new RecipientDevice(
+            self::VALID_GCM_IDENTIFIER,
+            $messageMock
+        );
 
         $this->assertEquals(
             self::VALID_GCM_IDENTIFIER,
@@ -39,8 +40,8 @@ class RecipientDeviceTest extends \PHPUnit_Framework_TestCase
     public static function messageProvider()
     {
         return array(
-            'GCM message' => array(new GCMMessage(), true),
-            'APNS message' => array(new APNSMessage(), false)
+            'GCM message' => array('Zbox\UnifiedPush\Message\Type\GCM', true),
+            'APNS message' => array('Zbox\UnifiedPush\Message\Type\APNS', false)
         );
     }
 }

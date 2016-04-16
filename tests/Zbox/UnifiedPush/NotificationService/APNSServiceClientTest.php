@@ -7,6 +7,11 @@ use Zbox\UnifiedPush\NotificationService\APNS\ServiceClient;
 
 class APNSServiceClientTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ServiceClient
+     */
+    protected $client;
+
     public function setUp()
     {
         $credentials = array(

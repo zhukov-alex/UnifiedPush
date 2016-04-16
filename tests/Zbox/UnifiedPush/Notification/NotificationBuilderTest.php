@@ -20,7 +20,7 @@ class NotificationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddPayloadHandler()
     {
-        $handler = $this->getPayloadHandlerMock();
+        $handler = $this->getMock('\Zbox\UnifiedPush\Notification\PayloadHandlerInterface');
 
         $this
             ->notificationBuilder
@@ -56,31 +56,6 @@ class NotificationBuilderTest extends \PHPUnit_Framework_TestCase
         $notification = $notifications->current();
 
         $this->assertSame($notification->getType(), NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE);
-    }
-
-    /**
-     * @return PayloadHandlerInterface
-     */
-    protected function getPayloadHandlerMock()
-    {
-        $payloadHandlerMock =
-            $this
-                ->getMockBuilder(
-                    '\Zbox\UnifiedPush\Notification\PayloadHandlerInterface'
-                )
-                ->setMethods(array(
-                    'isSupported',
-                    'setMessage',
-                    'setNotificationId',
-                    'getPayloadMaxLength',
-                    'getCustomNotificationData',
-                    'createPayload',
-                    'packPayload',
-                    'validatePayload'
-                ))
-                ->getMock();
-
-        return $payloadHandlerMock;
     }
 
     /**

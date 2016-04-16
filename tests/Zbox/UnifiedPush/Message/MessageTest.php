@@ -236,7 +236,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
      * @param string $type
      * @return PayloadHandlerInterface
      */
-    private function getPayloadHandlerByType($type)
+    protected function getPayloadHandlerByType($type)
     {
         $handlerClass = sprintf('\Zbox\UnifiedPush\Notification\PayloadHandler\%s', $type);
 

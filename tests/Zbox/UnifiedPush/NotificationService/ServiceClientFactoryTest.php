@@ -6,11 +6,23 @@ use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate;
 
 class ServiceClientFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ServiceClientFactory
+     */
+    protected $clientFactory;
+
+    public function setUp()
+    {
+        return $this->clientFactory =
+            new ServiceClientFactory(
+                $this->getCredentialsFactoryStub()
+            );
+    }
+
     public function testConfigInitialization()
     {
-        $clientFactory = new ServiceClientFactory(
-            $this->getCredentialsFactoryMock()
-        );
+        $clientFactory = $this->clientFactory;
+
         $clientFactory->setDevelopmentMode(true);
         $clientFactory->setServiceConfigPath($this->getPathToServicesConfig());
 
@@ -22,10 +34,7 @@ class ServiceClientFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDevelopmentMode()
     {
-        $clientFactory =
-            new ServiceClientFactory(
-                $this->getCredentialsFactoryMock()
-            );
+        $clientFactory = $this->clientFactory;
 
         $environmentProd = ServiceClientFactory::ENVIRONMENT_PRODUCTION;
         $environmentDev  = ServiceClientFactory::ENVIRONMENT_DEVELOPMENT;
@@ -39,44 +48,18 @@ class ServiceClientFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateServiceClient()
     {
-        $credentialsFactoryMock = $this->getCredentialsFactoryMock();
+        $clientFactory =
+            $this->clientFactory
+                ->setEnvironment(ServiceClientFactory::ENVIRONMENT_DEVELOPMENT)
+                ->setServiceConfigPath($this->getPathToServicesConfig())
+        ;
 
-        $factory = $this->getMockBuilder('\Zbox\UnifiedPush\NotificationService\ServiceClientFactory')
-            ->setConstructorArgs(array($credentialsFactoryMock))
-            ->setMethods(array('getServiceURL', 'getEnvironment'))
-            ->getMock();
-
-        $serviceName = NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE;
-
-        $serviceUrl  = array(
-            'host' => 'gateway.sandbox.push.apple.com',
-            'port' => 2195
+        $client = $clientFactory->createServiceClient(
+            NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE,
+            false
         );
 
-        $factory
-            ->expects($this->once())
-            ->method('getServiceURL')
-            ->will($this->returnValue($serviceUrl));
-
-        $factory
-            ->expects($this->any())
-            ->method('getEnvironment')
-            ->with($this->equalTo(ServiceClientFactory::ENVIRONMENT_PRODUCTION));
-
-        $client = $factory->createServiceClient($serviceName, $this->getAPNSCredentialsStub(), false);
         $this->assertInstanceOf('Zbox\UnifiedPush\NotificationService\APNS\ServiceClient', $client);
-    }
-
-    protected function getAPNSCredentialsStub()
-    {
-        return
-            CredentialsTest::createCredentialsOfType(
-                NotificationServices::APPLE_PUSH_NOTIFICATIONS_SERVICE,
-                array(
-                    'certificate' => APNSServiceClientTest::getPathToCertificate(),
-                    'certificatePassPhrase' => 'certificatePassPhrase'
-                )
-            );
     }
 
     /**
@@ -90,9 +73,9 @@ class ServiceClientFactoryTest extends \PHPUnit_Framework_TestCase
         . DIRECTORY_SEPARATOR . 'services.test.json';
     }
 
-    protected function getCredentialsFactoryMock()
+    protected function getCredentialsFactoryStub()
     {
-        $credentialsFactoryMock =
+        $credentialsFactory =
             $this
                 ->getMockBuilder(
                     '\Zbox\UnifiedPush\NotificationService\ServiceCredentialsFactory'
@@ -101,11 +84,11 @@ class ServiceClientFactoryTest extends \PHPUnit_Framework_TestCase
                 ->setMethods(array('getCredentialsByService'))
                 ->getMock();
 
-        $credentialsFactoryMock
+        $credentialsFactory
             ->expects($this->any())
             ->method('getCredentialsByService')
             ->will($this->returnValue(new SSLCertificate()));
 
-        return $credentialsFactoryMock;
+        return $credentialsFactory;
     }
 }
