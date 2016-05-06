@@ -9,9 +9,6 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
-use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
-use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken;
-use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate;
 use Zbox\UnifiedPush\Exception\DomainException;
 
 /**
@@ -24,6 +21,25 @@ class NotificationServices
     const GOOGLE_CLOUD_MESSAGING               = 'GCM';
     const MICROSOFT_PUSH_NOTIFICATIONS_SERVICE = 'MPNS';
 
+    const CREDENTIALS_NULL          = 1;
+    const CREDENTIALS_CERTIFICATE   = 2;
+    const CREDENTIALS_AUTH_TOKEN    = 3;
+
+    /**
+     * List of supported notification services
+     *
+     * @return array
+     */
+    public static function getAvailableServices()
+    {
+        return
+            array(
+                self::APPLE_PUSH_NOTIFICATIONS_SERVICE,
+                self::GOOGLE_CLOUD_MESSAGING,
+                self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE
+            );
+    }
+
     /**
      * Checks if notification service is supported
      *
@@ -33,11 +49,7 @@ class NotificationServices
      */
     public static function validateServiceName($serviceName)
     {
-        if (!in_array($serviceName, array(
-            self::APPLE_PUSH_NOTIFICATIONS_SERVICE,
-            self::GOOGLE_CLOUD_MESSAGING,
-            self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE,
-        ))) {
+        if (!in_array($serviceName, self::getAvailableServices())) {
             throw new DomainException(sprintf("Notification service '%s' is not supported.", $serviceName));
         }
         return $serviceName;
@@ -45,16 +57,16 @@ class NotificationServices
 
     /**
      * @param string $serviceName
-     * @return CredentialsInterface
+     * @return int
      */
     public static function getCredentialsTypeByService($serviceName)
     {
         self::validateServiceName($serviceName);
 
         $credentials = array(
-            self::APPLE_PUSH_NOTIFICATIONS_SERVICE      => new SSLCertificate(),
-            self::GOOGLE_CLOUD_MESSAGING                => new AuthToken(),
-            self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE  => new SSLCertificate()
+            self::APPLE_PUSH_NOTIFICATIONS_SERVICE      => self::CREDENTIALS_CERTIFICATE,
+            self::GOOGLE_CLOUD_MESSAGING                => self::CREDENTIALS_AUTH_TOKEN,
+            self::MICROSOFT_PUSH_NOTIFICATIONS_SERVICE  => self::CREDENTIALS_CERTIFICATE
         );
 
         return $credentials[$serviceName];

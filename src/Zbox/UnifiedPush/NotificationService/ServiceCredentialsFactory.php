@@ -9,10 +9,14 @@
 
 namespace Zbox\UnifiedPush\NotificationService;
 
+use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
 use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsMapper;
 use Zbox\UnifiedPush\Exception\InvalidArgumentException;
 use Zbox\UnifiedPush\Exception\RuntimeException;
 use Zbox\UnifiedPush\Exception\DomainException;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\NullCredentials;
+use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\SSLCertificate;
 
 class ServiceCredentialsFactory
 {
@@ -104,7 +108,7 @@ class ServiceCredentialsFactory
      *
      * @param string $serviceName
      * @throws DomainException
-     * @return array
+     * @return CredentialsInterface
      */
     public function getCredentialsByService($serviceName)
     {
@@ -122,9 +126,32 @@ class ServiceCredentialsFactory
             $this
                 ->credentialsMapper
                 ->mapCredentials(
-                    NotificationServices::getCredentialsTypeByService($serviceName),
+                    $this->getCredentialsDTOByServiceName($serviceName),
                     $this->config[$serviceName]
                 )
             ;
+    }
+
+    /**
+     * @param string $serviceName
+     * @return CredentialsInterface
+     */
+    private function getCredentialsDTOByServiceName($serviceName)
+    {
+        $credentialsType = NotificationServices::getCredentialsTypeByService($serviceName);
+
+        switch ($credentialsType) {
+            case NotificationServices::CREDENTIALS_CERTIFICATE:
+                return new SSLCertificate();
+
+            case NotificationServices::CREDENTIALS_AUTH_TOKEN:
+                return new AuthToken();
+
+            case NotificationServices::CREDENTIALS_NULL:
+                return new NullCredentials();
+
+            default:
+                throw new DomainException(sprintf("Unsupported credentials type '%s'", $credentialsType));
+        }
     }
 }
