@@ -160,7 +160,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                 break;
 
             default:
-                throw new DomainException(sprintf("Unsupported message type '%'", $messageType));
+                throw new DomainException(sprintf("Unsupported message type '%s'", $messageType));
                 break;
         }
     }

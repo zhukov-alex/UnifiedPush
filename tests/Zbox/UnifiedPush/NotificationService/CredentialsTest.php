@@ -92,7 +92,7 @@ class CredentialsTest extends \PHPUnit_Framework_TestCase
                 break;
 
             default:
-                throw new DomainException(sprintf("Unsupported service type '%'", $serviceType));
+                throw new DomainException(sprintf("Unsupported service type '%s'", $serviceType));
                 break;
         }
     }
