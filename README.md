@@ -46,7 +46,8 @@ $credentialsFactory =
         new CredentialsMapper()
     );
 
-$credentialsFactory->setCredentialsPath('pathToCredentialsConfig');
+$credentials = ['certificate' => 'path', 'certificatePassPhrase' => 'pass'];
+$credentialsFactory->addCredentialsForService('APNS', $credentials);
 
 $clientFactory = new ServiceClientFactory($credentialsFactory);
 $clientFactory->setDefaultConfigPath();

@@ -11,8 +11,6 @@ namespace Zbox\UnifiedPush\NotificationService;
 
 use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsInterface;
 use Zbox\UnifiedPush\Utils\ClientCredentials\CredentialsMapper;
-use Zbox\UnifiedPush\Exception\InvalidArgumentException;
-use Zbox\UnifiedPush\Exception\RuntimeException;
 use Zbox\UnifiedPush\Exception\DomainException;
 use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\AuthToken;
 use Zbox\UnifiedPush\Utils\ClientCredentials\DTO\NullCredentials;
@@ -26,14 +24,9 @@ class ServiceCredentialsFactory
     protected $credentialsMapper;
 
     /**
-     * @var string
+     * @var CredentialsInterface[]
      */
-    protected $credentialsPath;
-
-    /**
-     * @var array
-     */
-    protected $config;
+    protected $serviceCredentials;
 
     /**
      * @param CredentialsMapper $credentialsMapper
@@ -44,51 +37,21 @@ class ServiceCredentialsFactory
     }
 
     /**
-     * @param string $credentialsPath
+     * @param string $serviceName
+     * @param array $credentials
      * @return $this
      */
-    public function setCredentialsPath($credentialsPath)
+    public function addCredentialsForService($serviceName, $credentials)
     {
-        $this->credentialsPath = $credentialsPath;
-        return $this;
-    }
+        $credentialsDTO =
+            $this
+                ->credentialsMapper
+                ->mapCredentials(
+                    $this->getCredentialsDTOByServiceName($serviceName),
+                    $credentials
+                );
 
-    /**
-     * @param array $config
-     * @return $this
-     */
-    public function setConfig(array $config)
-    {
-        $this->config = $config;
-        return $this;
-    }
-
-    /**
-     * Load sender`s notification services credentials
-     *
-     * @return $this
-     * @throws DomainException
-     */
-    public function loadServiceCredentialsConfig()
-    {
-        $configPath = $this->credentialsPath;
-
-        if (!file_exists($configPath)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "Credentials file '%s' doesn`t exists",
-                    $configPath
-                )
-            );
-        }
-
-        $config = json_decode(file_get_contents($configPath), true);
-
-        if (!is_array($config)) {
-            throw new RuntimeException('Empty credentials config');
-        }
-
-        $this->config = $config;
+        $this->serviceCredentials[$serviceName] = $credentialsDTO;
 
         return $this;
     }
@@ -100,7 +63,7 @@ class ServiceCredentialsFactory
      */
     public function getInitializedServices()
     {
-        return array_keys($this->config);
+        return array_keys($this->serviceCredentials);
     }
 
     /**
@@ -112,24 +75,13 @@ class ServiceCredentialsFactory
      */
     public function getCredentialsByService($serviceName)
     {
-        if (empty($this->config)) {
-            $this->loadServiceCredentialsConfig();
-        }
-
         if (!in_array($serviceName, $this->getInitializedServices())) {
             throw new DomainException(
                 sprintf("Credentials for service '%s' was not initialized", $serviceName)
             );
         }
 
-        return
-            $this
-                ->credentialsMapper
-                ->mapCredentials(
-                    $this->getCredentialsDTOByServiceName($serviceName),
-                    $this->config[$serviceName]
-                )
-            ;
+        return $this->serviceCredentials[$serviceName];
     }
 
     /**
