@@ -149,9 +149,7 @@ class Dispatcher implements LoggerAwareInterface
     {
         $builder = $this->notificationBuilder;
 
-        $builder->buildNotifications($message);
-
-        $notifications = $builder->getNotificationCollection();
+        $notifications = $builder->buildNotifications($message);
 
         /** @var Notification $notification */
         foreach ($notifications as $notification) {

@@ -44,11 +44,6 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('buildNotifications')
             ->with($message)
-        ;
-
-        $notificationBuilder
-            ->expects($this->once())
-            ->method('getNotificationCollection')
             ->will($this->returnValue(new \ArrayIterator()))
         ;
 

@@ -38,9 +38,7 @@ class NotificationBuilderTest extends \PHPUnit_Framework_TestCase
             ->notificationBuilder
             ->addPayloadHandler(new APNSPayloadHandler());
 
-        $this->notificationBuilder->buildNotifications($this->createAPNSMessage());
-
-        $notifications = $this->notificationBuilder->getNotificationCollection();
+        $notifications = $this->notificationBuilder->buildNotifications($this->createAPNSMessage());
 
         $this->assertContainsOnlyInstancesOf(new Notification(), $notifications);
         $this->assertNotificationType($notifications);

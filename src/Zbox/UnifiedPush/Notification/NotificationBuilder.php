@@ -25,24 +25,6 @@ class NotificationBuilder
     private $payloadHandlers;
 
     /**
-     * @var MessageInterface
-     */
-    private $message;
-
-    /**
-     * @var \ArrayIterator
-     */
-    private $notificationCollection;
-
-    /**
-     * NotificationBuilder constructor.
-     */
-    public function __construct()
-    {
-        $this->notificationCollection = new \ArrayIterator();
-    }
-
-    /**
      * @param PayloadHandlerInterface $handler
      * @return $this
      */
@@ -66,24 +48,15 @@ class NotificationBuilder
     }
 
     /**
-     * @return \ArrayIterator
-     */
-    public function getNotificationCollection()
-    {
-        return $this->notificationCollection;
-    }
-
-    /**
      * Generates number of notifications by message recipient count
      * and notification service limitations
      *
      * @param MessageInterface $message
-     * @return $this
+     * @return \ArrayIterator
      */
     public function buildNotifications(MessageInterface $message)
     {
-        $this->message  = $message;
-
+        $notifications  = new \ArrayIterator();
         $recipientQueue = new \SplQueue();
         $recipientChunk = new \ArrayIterator();
 
@@ -101,23 +74,23 @@ class NotificationBuilder
         }
 
         while (!$recipientQueue->isEmpty()) {
-            $notification = $this->createNotification($recipientQueue->dequeue());
-            $this->notificationCollection->append($notification);
+            $notification = $this->createNotification($recipientQueue->dequeue(), $message);
+            $notifications->append($notification);
         }
 
-        return $this;
+        return $notifications;
     }
 
     /**
      * Returns created notification
      *
      * @param \ArrayIterator $recipients
+     * @param MessageInterface $message
      * @return Notification
-     * @throws MalformedNotificationException
      */
-    private function createNotification(\ArrayIterator $recipients)
+    private function createNotification(\ArrayIterator $recipients, MessageInterface $message)
     {
-        $message = clone $this->message;
+        $message = clone $message;
         $message->setRecipientDeviceCollection($recipients);
 
         $handlers = $this->getPayloadHandlers();
