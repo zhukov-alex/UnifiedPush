@@ -26,6 +26,7 @@ The recommended way to install UnifiedPush is [through composer](http://getcompo
 ## Requirements
 * PHP 5.3.2 or later
 * HTTP client (kriswallsmith/buzz)
+* PSR Log (psr/log)
 * PHPUnit to run tests
 
 ## Usage
