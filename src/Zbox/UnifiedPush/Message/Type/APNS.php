@@ -76,6 +76,13 @@ class APNS extends MessageBase
     private $customPayloadData = array();
 
     /**
+     * Safari url args
+     *
+     * @var array
+     */
+    private $urlArgs;
+
+    /**
      * Gets message type
      *
      * @return string
@@ -226,6 +233,24 @@ class APNS extends MessageBase
         }
         $this->category = $category;
 
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUrlArgs()
+    {
+        return $this->urlArgs;
+    }
+
+    /**
+     * @param array $urlArgs
+     * @return $this
+     */
+    public function setUrlArgs($urlArgs)
+    {
+        $this->urlArgs = $urlArgs;
         return $this;
     }
 

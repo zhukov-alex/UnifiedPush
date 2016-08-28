@@ -53,7 +53,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                         'badge' => 1,
                         'sound' => 'test',
                         'category' => 'test',
-                        'content-available' => 1
+                        'content-available' => 1,
+                        'url-args' => array('test', '1')
                     ),
                     'key' => 'val'
             )),
@@ -177,6 +178,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             ->setSound('test')
             ->setCategory('test')
             ->setBadge(1)
+            ->setUrlArgs(array('test', '1'))
             ->setContentAvailable(true)
             ->setCustomPayloadData(array('key' => 'val'))
         ;
