@@ -52,6 +52,11 @@ class APNS extends PayloadHandler
             )
         );
 
+        $urlArgs = $message->getUrlArgs();
+        if (!empty($urlArgs)) {
+            $payload['aps']['url-args'] = $urlArgs;
+        }
+
         if ($message->isContentAvailable() === true) {
             $payload['aps']['content-available'] = 1;
         }
