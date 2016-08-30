@@ -83,6 +83,11 @@ class APNS extends MessageBase
     private $urlArgs;
 
     /**
+     * @var bool
+     */
+    private $mutableContent;
+
+    /**
      * Gets message type
      *
      * @return string
@@ -251,6 +256,24 @@ class APNS extends MessageBase
     public function setUrlArgs($urlArgs)
     {
         $this->urlArgs = $urlArgs;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isMutableContent()
+    {
+        return $this->mutableContent;
+    }
+
+    /**
+     * @param boolean $mutableContent
+     * @return $this
+     */
+    public function setMutableContent($mutableContent)
+    {
+        $this->mutableContent = (bool) $mutableContent;
         return $this;
     }
 

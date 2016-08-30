@@ -54,6 +54,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                         'sound' => 'test',
                         'category' => 'test',
                         'content-available' => 1,
+                        'mutable-content' => 1,
                         'url-args' => array('test', '1')
                     ),
                     'key' => 'val'
@@ -180,6 +181,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             ->setBadge(1)
             ->setUrlArgs(array('test', '1'))
             ->setContentAvailable(true)
+            ->setMutableContent(true)
             ->setCustomPayloadData(array('key' => 'val'))
         ;
         return $message;

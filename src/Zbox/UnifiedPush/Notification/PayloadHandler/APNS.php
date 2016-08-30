@@ -61,6 +61,10 @@ class APNS extends PayloadHandler
             $payload['aps']['content-available'] = 1;
         }
 
+        if ($message->isMutableContent() === true) {
+            $payload['aps']['mutable-content'] = 1;
+        }
+
         return array_merge($payload, $message->getCustomPayloadData());
     }
 
