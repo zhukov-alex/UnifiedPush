@@ -84,10 +84,17 @@ Create messages of type APNS, GCM, MPNS (Raw, Tile or Toast).
 
 use Zbox\UnifiedPush\Message\MessageCollection;
 use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
+use Zbox\UnifiedPush\Message\Type\APNSAlert;
 use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
 
 $message1 = new APNSMessage();
 $message1
+    ->setAlertDictionary(
+        (new APNSAlert)
+            ->setActionLocKey('btn')
+            ->setLocKey('msg')
+            ->setLocArgs([$args])
+    )
 	->setSound('alert')
 	->getBadge('2');
 

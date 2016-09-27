@@ -41,6 +41,13 @@ class APNS extends MessageBase
     private $alert;
 
     /**
+     * Alert dictionary
+     *
+     * @var APNSAlert|null
+     */
+    private $alertDictionary;
+
+    /**
      * The number to display as the badge of the application icon
      *
      * @var integer
@@ -116,6 +123,24 @@ class APNS extends MessageBase
         }
         $this->alert = $alert;
 
+        return $this;
+    }
+
+    /**
+     * @return APNSAlert|null
+     */
+    public function getAlertDictionary()
+    {
+        return $this->alertDictionary;
+    }
+
+    /**
+     * @param APNSAlert $alertDictionary
+     * @return APNS
+     */
+    public function setAlertDictionary(APNSAlert $alertDictionary)
+    {
+        $this->alertDictionary = $alertDictionary;
         return $this;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Zbox\UnifiedPush\Message;
 
+use Zbox\UnifiedPush\Message\Type\APNSAlert;
 use Zbox\UnifiedPush\Notification\PayloadHandlerInterface;
 use Zbox\UnifiedPush\Message\Type\APNS as APNSMessage;
 use Zbox\UnifiedPush\Message\Type\GCM as GCMMessage;
@@ -11,6 +12,7 @@ use Zbox\UnifiedPush\Exception\DomainException;
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
     const APNS_MESSAGE = 'APNS';
+    const APNS_EXT_MESSAGE = 'APNS_EXT';
     const GCM_MESSAGE  = 'GCM';
     const MPNS_MESSAGE = 'MPNS';
 
@@ -29,10 +31,12 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $message->addRecipientIdentifiers($recipients);
 
+        $handlerName = substr($messageType, 0, strcspn($messageType,'_'));
+
         $this->assertEquals(
             $messageSample,
             $this
-                ->getPayloadHandlerByType($messageType)
+                ->getPayloadHandlerByType($handlerName)
                 ->setMessage($message)
                 ->createPayload()
         );
@@ -47,18 +51,24 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             'TestApnsMessage' => array(
                 self::APNS_MESSAGE,
                 '4efa148eb41f2e7103f21410bf48346c1afa148eb41f2e7103f21410bf48346c',
-                array(
-                    'aps' => array(
-                        'alert' => 'Text of an alert',
-                        'badge' => 1,
-                        'sound' => 'test',
-                        'category' => 'test',
-                        'content-available' => 1,
-                        'mutable-content' => 1,
-                        'url-args' => array('test', '1')
-                    ),
-                    'key' => 'val'
-            )),
+                self::getAPNSPayload('Text of an alert'),
+            ),
+            'TestApnsExtendedMessage' => array(
+                self::APNS_EXT_MESSAGE,
+                '4efa148eb41f2e7103f21410bf48346c1afa148eb41f2e7103f21410bf48346c',
+                self::getAPNSPayload(
+                    array(
+                        'body'              => 'b',
+                        'title'             => 't',
+                        'title-loc-key'     => 'tlc',
+                        'title-loc-args'    => array('tla'),
+                        'action-loc-key'    => 'alk',
+                        'loc-key'           => 'lk',
+                        'loc-args'          => array('la'),
+                        'launch-image'      => 'li'
+                    )
+                ),
+            ),
             'TestGCMMessage' => array(
                 self::GCM_MESSAGE,
                 'device1',
@@ -153,6 +163,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
                 return $this->createAPNSMessage();
                 break;
 
+            case self::APNS_EXT_MESSAGE:
+                return $this->createAPNSExtendedMessage();
+                break;
+
             case self::GCM_MESSAGE:
                 return $this->createGCMMessage();
                 break;
@@ -172,19 +186,35 @@ class MessageTest extends \PHPUnit_Framework_TestCase
      */
     public function createAPNSMessage()
     {
-        $message = new APNSMessage();
+        return
+            $this
+                ->createBaseAPNSMessage()
+                ->setAlert('Text of an alert')
+            ;
+    }
 
-        $message
-            ->setAlert('Text of an alert')
-            ->setSound('test')
-            ->setCategory('test')
-            ->setBadge(1)
-            ->setUrlArgs(array('test', '1'))
-            ->setContentAvailable(true)
-            ->setMutableContent(true)
-            ->setCustomPayloadData(array('key' => 'val'))
+    /**
+     * @return APNSMessage
+     */
+    public function createAPNSExtendedMessage()
+    {
+        $dict = new APNSAlert();
+        $dict
+            ->setBody('b')
+            ->setActionLocKey('alk')
+            ->setLaunchImage('li')
+            ->setLocArgs(array('la'))
+            ->setLocKey('lk')
+            ->setTitle('t')
+            ->setTitleLocArgs(array('tla'))
+            ->setTitleLocKey('tlc')
         ;
-        return $message;
+
+        return
+            $this
+                ->createBaseAPNSMessage()
+                ->setAlertDictionary($dict)
+            ;
     }
 
     /**
@@ -234,6 +264,46 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $rootElement->appendChild($element);
 
         return $message;
+    }
+
+    /**
+     * @return APNSMessage
+     */
+    protected function createBaseAPNSMessage()
+    {
+        $message = new APNSMessage();
+
+        $message
+            ->setSound('test')
+            ->setCategory('test')
+            ->setBadge(1)
+            ->setUrlArgs(array('test', '1'))
+            ->setContentAvailable(true)
+            ->setMutableContent(true)
+            ->setCustomPayloadData(array('key' => 'val'))
+        ;
+        return $message;
+    }
+
+    /**
+     * @param array|string $alert
+     * @return array
+     */
+    protected static function getAPNSPayload($alert)
+    {
+        return
+            array(
+                'aps' => array(
+                    'alert' => $alert,
+                    'badge' => 1,
+                    'sound' => 'test',
+                    'category' => 'test',
+                    'content-available' => 1,
+                    'mutable-content' => 1,
+                    'url-args' => array('test', '1')
+                ),
+                'key' => 'val'
+            );
     }
 
     /**
