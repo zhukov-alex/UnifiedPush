@@ -45,7 +45,7 @@ class APNS extends PayloadHandler
 
         $payload = array(
             'aps' => array(
-                'alert' => $message->getAlert(),
+                'alert' => $this->populateAlert($message),
                 'badge' => $message->getBadge(),
                 'sound' => $message->getSound(),
                 'category' => $message->getCategory(),
@@ -96,5 +96,31 @@ class APNS extends PayloadHandler
         $packedPayload .= $payload;
 
         return $packedPayload;
+    }
+
+    /**
+     * @param APNSMessage $message
+     * @return array|string
+     */
+    protected function populateAlert(APNSMessage $message)
+    {
+        $dict = $message->getAlertDictionary();
+
+        if (is_null($dict)) {
+            return $message->getAlert();
+        }
+
+        $alert = array(
+            'body'              => $dict->getBody(),
+            'title'             => $dict->getTitle(),
+            'title-loc-key'     => $dict->getTitleLocKey(),
+            'title-loc-args'    => $dict->getTitleLocArgs(),
+            'action-loc-key'    => $dict->getActionLocKey(),
+            'loc-key'           => $dict->getLocKey(),
+            'loc-args'          => $dict->getLocArgs(),
+            'launch-image'      => $dict->getLaunchImage()
+        );
+
+        return array_filter($alert);
     }
 }
