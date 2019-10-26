@@ -210,6 +210,7 @@ class Dispatcher implements LoggerAwareInterface
             $this->logger->error(
                 sprintf("Client connection error: %s", $e->getMessage())
             );
+            return $this;
 
         } catch (RuntimeException $e) {
             $this->logger->error(
